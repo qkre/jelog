@@ -8,7 +8,7 @@
   /* border: 2px solid red; */
   display: flex;
   flex-direction: column;
-  padding: 10px;
+  padding: 5px 20px 5px 20px;
 }
 
 .container .header {
@@ -17,24 +17,49 @@
   justify-content: space-between;
 }
 
-.container .header button {
+.container .header .tags {
+  display: flex;
+}
+
+.container .header .tags * {
+  display: flex;
   border: none;
-  margin-right: 5px;
+  padding: 10px;
   font-size: 20px;
+  align-items: center;
   background-color: white;
   cursor: pointer;
+  text-decoration: none;
+  color: black;
+}
+
+.container .header button {
+  border: none;
+  background-color: white;
+  font-size: 20px;
+  padding: 10px;
 }
 
 .container .body {
   /* border: 2px solid blue; */
   display: flex;
   flex-wrap: wrap;
+  justify-content: space-evenly;
 }
 
 .container .body .postBox {
   width: 300px;
   height: 400px;
-  margin: 5px 5px 0px 0px;
+  padding: 5px;
+  margin-top: 5px;
   border: 2px solid black;
   background-color: gainsboro;
+  border-radius: 1.25%;
+  box-shadow: 2px 2px grey;
+  transition: 0.25s;
+}
+
+.container .body .postBox:hover {
+  transform: translateY(-5px);
+  box-shadow: 8px 8px grey;
 }
