@@ -1,0 +1,63 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+.header {
+  /* border: 2px solid red; */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+}
+
+.header .logos {
+  /* border: 2px solid blue; */
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.header .logos .logoImage {
+  margin-right: 5px;
+  color: white;
+  background-color: black;
+  border-radius: 5px;
+  width: 25px;
+  height: 25px;
+  text-align: center;
+  font-size: 25px;
+  font-family: "Courier New", Courier, monospace;
+  /* border: 2px solid black; */
+}
+
+.header .logos .logoString {
+  font-size: 24px;
+  font-weight: bold;
+  border: none;
+  background-color: white;
+  /* border: 2px solid black; */
+}
+
+.header .buttons {
+  /* border: 2px solid blue; */
+  display: flex;
+  align-items: center;
+}
+
+.header .buttons > button {
+  border: none;
+  font-size: 20px;
+  margin-right: 10px;
+  /* border: 2px solid black; */
+  cursor: pointer;
+  background-color: white;
+}
+
+.header .buttons .userIcon {
+  width: 35px;
+  height: 35px;
+  border-radius: 50%;
+  background-color: aquamarine;
+}
