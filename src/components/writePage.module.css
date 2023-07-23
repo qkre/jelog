@@ -92,7 +92,7 @@ button {
 
 .container .inputSection .bottomSection .buttonSave {
   padding: 10px;
-  color: rgb(61, 182, 61);
+  color: var(--velog-green);
   font-weight: 800;
   margin-right: 10px;
   text-decoration: none;
@@ -102,7 +102,7 @@ button {
   padding: 10px;
   color: white;
   font-weight: 800;
-  background-color: rgb(61, 182, 61);
+  background-color: var(--velog-green);
   border-radius: 5px;
   text-decoration: none;
 }
