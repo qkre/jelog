@@ -24,10 +24,6 @@ export default function PostPage(props) {
     closeModal();
     const newPosts = [...posts];
     newPosts.splice(postID, 1);
-    newPosts.map((item, index) => {
-      item.id = index.toString();
-    });
-    console.log(newPosts);
     setPost(newPosts);
   };
   const closeModal = () => {
