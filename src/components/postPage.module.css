@@ -1,0 +1,206 @@
+button {
+  cursor: pointer;
+}
+
+.container {
+  padding: 20px 100px 20px 100px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.container .sideBarSection {
+  flex: 1;
+  display: flex;
+  justify-content: end;
+}
+
+.container .sideBarSection .sideBarMenu {
+  width: 60px;
+  height: 150px;
+  border-radius: 50px;
+  background-color: var(--velog-grey);
+  padding: 10px;
+  display: flex;
+  font-size: 20px;
+  flex-direction: column;
+  text-align: center;
+}
+
+.container .sideBarSection .sideBarMenu button {
+  font-size: 20px;
+  background-color: white;
+  padding: 10px;
+  border-radius: 50%;
+  color: gray;
+}
+
+.container .sideBarSection .sideBarMenu .likesCount {
+  padding: 10px;
+}
+
+.container .mainSection {
+  flex: 8;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  margin: 0px 30px;
+}
+
+.container .mainSection .headerSection .title {
+  font-size: 40px;
+  font-weight: 800;
+}
+
+.container .mainSection .headerSection .postInfoSection {
+  display: flex;
+  margin: 10px 0px 10px 0px;
+  justify-content: space-between;
+}
+
+.container .mainSection .headerSection .postInfoSection .userInfo .userID {
+  font-weight: 600;
+  margin-right: 10px;
+}
+
+.container .mainSection .headerSection .postInfoSection .userInfo .uploadDate {
+  color: grey;
+}
+
+.container .mainSection .headerSection .postInfoSection .postFunctions {
+  color: grey;
+  cursor: pointer;
+}
+
+.container
+  .mainSection
+  .headerSection
+  .postInfoSection
+  .postFunctions
+  .buttonMod {
+  margin: 0px 5px 0px 5px;
+  color: grey;
+  text-decoration: none;
+}
+
+.container .mainSection .headerSection .tagSection {
+  display: flex;
+}
+
+.container .mainSection .headerSection .tagSection * {
+  color: var(--velog-green);
+  padding: 2.5px 10px;
+  background-color: var(--velog-grey);
+  margin-right: 5px;
+  border-radius: 50px;
+}
+
+.container .mainSection .seriesSection {
+  padding: 20px;
+  margin: 20px 0px 50px 0px;
+  background-color: var(--velog-grey);
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+}
+
+.container .mainSection .seriesSection .seriesTitle {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 40px;
+}
+
+.container .mainSection .seriesSection .indicators {
+  display: flex;
+  justify-content: space-between;
+}
+
+.container .mainSection .seriesSection .indicators .buttonShowList {
+  background-color: var(--velog-grey);
+}
+
+.container .mainSection .seriesSection .indicators .pageIndicators .pages {
+  font-size: 14px;
+  color: grey;
+  margin-right: 10px;
+}
+
+.container .mainSection .seriesSection .indicators .pageIndicators button {
+  width: 17.5px;
+  height: 18px;
+  font-weight: 800;
+  color: var(--velog-green);
+  background-color: white;
+  margin-left: 5px;
+  border-radius: 50%;
+}
+
+.container .summarySection {
+  flex: 1;
+  /* border: 2px solid red; */
+  display: flex;
+  flex-direction: column;
+  margin-left: 10px;
+}
+
+.container .summarySection .summaryIndexes {
+  display: flex;
+  flex-direction: column;
+  max-width: 200px;
+  color: grey;
+  border-left: 2px solid var(--velog-grey);
+  padding: 5px;
+}
+
+.deleteModal {
+  width: 350px;
+  height: 180px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: flex;
+  flex-direction: column;
+  background-color: white;
+  padding: 30px 20px;
+  justify-content: space-between;
+  transform: translate(-50%, -50%);
+  box-shadow: 0px 0px 10px 1px rgb(200, 200, 200);
+}
+
+.deleteModal .modalTitle {
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.deleteModal .modalContent {
+  margin-bottom: 10px;
+}
+
+.deleteModal .modalButtons {
+  display: flex;
+  justify-content: end;
+  cursor: pointer;
+}
+
+.deleteModal .modalButtons .buttonCancel {
+  color: var(--velog-green);
+  border-radius: 5px;
+  font-weight: 800;
+  padding: 5px 15px;
+  margin-right: 10px;
+}
+
+.deleteModal .modalButtons .buttonCancel:hover {
+  background-color: var(--velog-grey);
+}
+
+.deleteModal .modalButtons .buttonConfirm {
+  color: white;
+  background-color: var(--velog-green);
+  border-radius: 5px;
+  font-weight: 800;
+  padding: 5px 15px;
+}
+
+.deleteModal .modalButtons .buttonConfirm:hover {
+  background-color: var(--velog-green-bright);
+}

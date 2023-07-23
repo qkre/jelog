@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import styles from "./writePage.module.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,15 +7,25 @@ import {
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
-export default function WritePage(props) {
-  const { posts, addPost } = props;
+export default function ModPage(props) {
+  const { posts, setPost } = props;
+
+  const postID = useLocation().pathname.split("/")[2];
+  const post = posts.find((item) => item.id === postID);
 
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+
+  useEffect(() => {
+    titleTextareaRef.current.value = post.title;
+    contentTextareaRef.current.value = post.content;
+    previewTitleRef.current.value = post.title;
+    previewContentRef.current.value = post.content;
+  });
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -39,14 +49,18 @@ export default function WritePage(props) {
     const today = new Date();
     const title = titleTextareaRef.current.value;
     const content = contentTextareaRef.current.value;
-    const newPost = {
-      id: posts.length.toString(),
+    const modifiedPost = {
+      id: postID,
       title: title,
       content: content,
+      likesCount: post.likesCount,
       date: today.toLocaleDateString(),
-      likesCount: 0,
     };
-    addPost([...posts, newPost]);
+    const updatedPosts = posts.map((item) =>
+      item.id === postID ? modifiedPost : item
+    );
+
+    setPost(updatedPosts);
   };
 
   return (
@@ -118,7 +132,7 @@ export default function WritePage(props) {
               className={styles.buttonPost}
               onClick={handleAddPost}
             >
-              출간하기
+              수정하기
             </Link>
           </div>
         </section>
