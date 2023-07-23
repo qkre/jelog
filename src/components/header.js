@@ -6,14 +6,9 @@ import {
   faMagnifyingGlass,
   faArrowDown,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Header(props) {
-  const { addTrendPost, addRecentPost } = props;
-  const location = useLocation();
-
-  const addPost = location.pathname === "/" ? addTrendPost : addRecentPost;
-
   return (
     <section className={styles.header}>
       <div className={styles.logos}>
@@ -29,9 +24,9 @@ export default function Header(props) {
         <button className={styles.search}>
           <FontAwesomeIcon icon={faMagnifyingGlass} />
         </button>
-        <button className={styles.newPost} onClick={addPost}>
+        <Link to="/write" className={styles.newPost}>
           새 글 작성
-        </button>
+        </Link>
         <button className={styles.userIcon}></button>
         <button className={styles.moreInfo}>
           <FontAwesomeIcon icon={faArrowDown} />

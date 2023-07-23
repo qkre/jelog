@@ -1,47 +1,44 @@
 import "./App.css";
-import Header from "./components/header";
-import Body from "./components/body";
 import { useState } from "react";
-import { BrowserRouter, useLocation } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import WritePage from "./components/writePage";
+import MainPage from "./components/mainPage";
+import RecentPage from "./components/recentPage";
 function App() {
-  const [trendList, setTrendList] = useState([]);
-  const [recentList, setRecentList] = useState([]);
+  const [postList, setPostList] = useState([]);
 
-  const trendPost = trendList.map((item, index) => {
+  const posts = postList.map((item, index) => {
     return (
       <div key={index} className="postBox">
-        트렌딩 {index + 1}번째 포스트
+        <div className="innerBox">
+          <div className="thumbnail">THUMBNAIL</div>
+          <span className="title">{item.title}</span>
+          <span className="content">{item.content}</span>
+        </div>
+        <span className="date">{item.date}</span>
       </div>
     );
   });
 
-  const recentPost = recentList.map((item, index) => {
-    return (
-      <div key={index} className="postBox">
-        최신 {index + 1}번째 포스트
-      </div>
-    );
-  });
-
-  const addTrendPost = () => {
-    setTrendList([...trendList, "NewPost"]);
-    console.log(trendList);
-  };
-  const addRecentPost = () => {
-    setRecentList([...recentList, "NewPost"]);
-    console.log(recentList);
-  };
+  console.log(postList);
 
   return (
     <BrowserRouter>
-      <div>
-        <Header addTrendPost={addTrendPost} addRecentPost={addRecentPost} />
-        <Body
-          trendList={trendPost}
-          setTrendList={addTrendPost}
-          recentList={recentPost}
-          setRecentList={addRecentPost}
-        />
+      <div className="container">
+        <Routes>
+          <Route
+            path="/write"
+            element={<WritePage posts={postList} addPost={setPostList} />}
+          />
+          <Route
+            path="/"
+            element={<MainPage posts={posts} addPost={setPostList} />}
+          />
+          <Route
+            path="/recent"
+            element={<RecentPage posts={posts} addPost={setPostList} />}
+          />
+        </Routes>
       </div>
     </BrowserRouter>
   );

@@ -9,7 +9,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  margin-bottom: 50px;
 }
 
 .header .logos {
@@ -20,7 +20,6 @@
 }
 
 .header .logos .logoImage {
-  margin-right: 5px;
   color: white;
   background-color: black;
   border-radius: 5px;
@@ -31,6 +30,7 @@
   font-family: "Courier New", Courier, monospace;
   text-decoration: none;
   /* border: 2px solid black; */
+  margin-right: 10px;
 }
 
 .header .logos .logoString {
@@ -52,10 +52,28 @@
 .header .buttons > button {
   border: none;
   font-size: 20px;
-  margin-right: 10px;
   /* border: 2px solid black; */
   cursor: pointer;
   background-color: white;
+  margin-left: 10px;
+}
+
+.header .buttons .newPost {
+  border: 2px solid black;
+  border-radius: 50px;
+  padding: 5px 15px 5px 15px;
+  font-size: 16px;
+  font-weight: 800;
+  cursor: pointer;
+  margin-left: 10px;
+  text-decoration: none;
+  color: black;
+  transition: 0.25s;
+}
+
+.header .buttons .newPost:hover {
+  color: white;
+  background-color: black;
 }
 
 .header .buttons .userIcon {

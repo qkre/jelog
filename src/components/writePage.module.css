@@ -1,0 +1,132 @@
+.container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.container .inputSection {
+  width: 50%;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.container .previewSection {
+  width: 50%;
+  height: 100vh;
+  background-color: aliceblue;
+}
+
+.container .inputSection input,
+button {
+  border: none;
+  background-color: white;
+}
+
+.container .inputSection .title {
+  width: 100%;
+  font-size: 44px;
+  font-weight: 600;
+  overflow: hidden;
+  resize: none;
+  border: none;
+}
+
+.container .inputSection .titleBar {
+  width: 50px;
+  height: 5px;
+  background-color: black;
+  margin: 10px 0;
+}
+
+.container .inputSection .tag {
+  margin-bottom: 10px;
+}
+
+.container .inputSection .buttons {
+  padding: 5px;
+}
+
+.container .inputSection .buttons * {
+  margin-right: 10px;
+  color: gray;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.container .inputSection .buttons .buttonBar {
+  font-size: 16px;
+  font-weight: 100;
+}
+
+.container .inputSection .buttons button {
+  font-family: "Courier New", Courier, monospace;
+  cursor: pointer;
+}
+
+.container .inputSection .buttons .buttonItalic {
+  font-style: italic;
+  margin-right: 15px;
+}
+
+.container .inputSection .content {
+  border: none;
+  resize: none;
+  width: 100%;
+  height: 60vh;
+}
+
+.container .inputSection .bottomSection {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.container .inputSection .bottomSection .buttonExit {
+  padding: 10px;
+  font-weight: 800;
+  color: black;
+  text-decoration: none;
+}
+
+.container .inputSection .bottomSection .buttonSave {
+  padding: 10px;
+  color: rgb(61, 182, 61);
+  font-weight: 800;
+  margin-right: 10px;
+  text-decoration: none;
+}
+
+.container .inputSection .bottomSection .buttonPost {
+  padding: 10px;
+  color: white;
+  font-weight: 800;
+  background-color: rgb(61, 182, 61);
+  border-radius: 5px;
+  text-decoration: none;
+}
+
+.container .previewSection {
+  display: flex;
+  flex-direction: column;
+  height: auto;
+  padding: 20px;
+}
+
+.container .previewSection .previewTitle {
+  background-color: aliceblue;
+  border: none;
+  margin-bottom: 40px;
+  font-size: 44px;
+  font-weight: 600;
+  resize: none;
+  overflow: hidden;
+}
+
+.container .previewSection .previewContent {
+  background-color: aliceblue;
+  border: none;
+  resize: none;
+  overflow: hidden;
+}
