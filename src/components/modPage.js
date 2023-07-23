@@ -45,7 +45,7 @@ export default function ModPage(props) {
     previewContentRef.current.value = contentTextareaRef.current.value;
   };
 
-  const handleAddPost = () => {
+  const handleModPost = () => {
     const today = new Date();
     const title = titleTextareaRef.current.value;
     const content = contentTextareaRef.current.value;
@@ -130,7 +130,7 @@ export default function ModPage(props) {
             <Link
               to={"/"}
               className={styles.buttonPost}
-              onClick={handleAddPost}
+              onClick={handleModPost}
             >
               수정하기
             </Link>
