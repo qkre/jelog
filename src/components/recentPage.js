@@ -8,10 +8,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import Header from "./header";
 export default function RecentPage(props) {
-  const { posts, addPost } = props;
+  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
+    props;
   return (
     <div>
-      <Header posts={posts} addPost={addPost} />
       <section className={styles.container}>
         <section className={styles.header}>
           <div className={styles.tags}>
@@ -28,7 +28,7 @@ export default function RecentPage(props) {
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </button>
         </section>
-        <section className={styles.body}>{posts}</section>
+        <section className={styles.body}>{postList}</section>
       </section>
     </div>
   );

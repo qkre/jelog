@@ -10,7 +10,8 @@ import {
 import { Link } from "react-router-dom";
 
 export default function WritePage(props) {
-  const { posts, addPost } = props;
+  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
+    props;
 
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
@@ -40,13 +41,16 @@ export default function WritePage(props) {
     const title = titleTextareaRef.current.value;
     const content = contentTextareaRef.current.value;
     const newPost = {
-      id: posts.length.toString(),
+      userID: userID,
+      id: postList.length.toString(),
       title: title,
       content: content,
       date: today.toLocaleDateString(),
       likesCount: 0,
     };
-    addPost([...posts, newPost]);
+    setPostList([...postList, newPost]);
+    const headerContainer = document.querySelector(".headerContainer");
+    headerContainer.classList.remove("hide");
   };
 
   return (
@@ -105,12 +109,28 @@ export default function WritePage(props) {
           />
         </div>
         <section className={styles.bottomSection}>
-          <Link to={"/"} className={styles.buttonExit}>
+          <Link
+            to={"/"}
+            className={styles.buttonExit}
+            onClick={() => {
+              const headerContainer =
+                document.querySelector(".headerContainer");
+              headerContainer.classList.remove("hide");
+            }}
+          >
             <FontAwesomeIcon icon={faArrowLeft} />
             {" 나가기"}
           </Link>
           <div>
-            <Link to={"/"} className={styles.buttonSave}>
+            <Link
+              to={"/"}
+              className={styles.buttonSave}
+              onClick={() => {
+                const headerContainer =
+                  document.querySelector(".headerContainer");
+                headerContainer.classList.remove("hide");
+              }}
+            >
               임시저장
             </Link>
             <Link

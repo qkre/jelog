@@ -11,10 +11,10 @@ import { Link } from "react-router-dom";
 import Header from "./header";
 
 export default function MainPage(props) {
-  const { posts, addPost } = props;
+  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
+    props;
   return (
     <div>
-      <Header posts={posts} addPost={addPost} />
       <section className={styles.container}>
         <section className={styles.header}>
           <div className={styles.tags}>
@@ -34,7 +34,7 @@ export default function MainPage(props) {
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </button>
         </section>
-        <section className={styles.body}>{posts}</section>
+        <section className={styles.body}>{postList}</section>
       </section>
     </div>
   );

@@ -11,9 +11,9 @@ import Modal from "react-modal";
 import { useRef, useState } from "react";
 
 export default function PostPage(props) {
-  const { posts, setPost } = props;
-  const postID = useLocation().pathname.split("/")[2];
-  const post = posts.find((item) => item.id === postID);
+  const { postList, setPostList, userID } = props;
+  const postID = useLocation().pathname.split("/")[3];
+  const post = postList.find((item) => item.id === postID);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
 
@@ -22,9 +22,9 @@ export default function PostPage(props) {
   };
   const handleButtonConfirm = () => {
     closeModal();
-    const newPosts = [...posts];
+    const newPosts = [...postList];
     newPosts.splice(postID, 1);
-    setPost(newPosts);
+    setPostList(newPosts);
   };
   const closeModal = () => {
     setIsModalOpen(false);
@@ -40,11 +40,11 @@ export default function PostPage(props) {
       date: post.date,
       likesCount: likesCount,
     };
-    const updatedPosts = posts.map((item) =>
+    const updatedPosts = postList.map((item) =>
       item.id === postID ? modifiedPost : item
     );
 
-    setPost(updatedPosts);
+    setPostList(updatedPosts);
   };
 
   return (
@@ -69,7 +69,6 @@ export default function PostPage(props) {
           </Link>
         </div>
       </Modal>
-      <Header posts={posts} addPost={setPost} />
       <section className={styles.container}>
         <section className={styles.sideBarSection}>
           <div className={styles.sideBarMenu}>

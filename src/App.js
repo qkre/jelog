@@ -6,8 +6,11 @@ import MainPage from "./components/mainPage";
 import RecentPage from "./components/recentPage";
 import PostPage from "./components/postPage";
 import ModPage from "./components/modPage";
+import Header from "./components/header";
 function App() {
   const [postList, setPostList] = useState([]);
+  const [isLogin, setIsLogin] = useState(false);
+  const [userID, setUserID] = useState();
 
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
@@ -16,7 +19,11 @@ function App() {
 
   const trendingPosts = trendingPostList.map((item, index) => {
     return (
-      <Link to={`/post/${item.id}`} key={index} className="postBox">
+      <Link
+        to={`/post/${item.userID}/${item.id}`}
+        key={index}
+        className="postBox"
+      >
         <div className="innerBox">
           <div className="thumbnail">THUMBNAIL</div>
           <span className="title">{item.title}</span>
@@ -29,7 +36,11 @@ function App() {
 
   const recentPosts = recentPostList.map((item, index) => {
     return (
-      <Link to={`/post/${item.id}`} key={index} className="postBox">
+      <Link
+        to={`/post/${item.userID}/${item.id}`}
+        key={index}
+        className="postBox"
+      >
         <div className="innerBox">
           <div className="thumbnail">THUMBNAIL</div>
           <span className="title">{item.title}</span>
@@ -47,26 +58,73 @@ function App() {
   return (
     <BrowserRouter>
       <div className="container">
+        <Header
+          posts={postList}
+          addPost={setPostList}
+          isLogin={isLogin}
+          setIsLogin={setIsLogin}
+          userID={userID}
+          setUserID={setUserID}
+        />
         <Routes>
           <Route
             index="index"
-            element={<MainPage posts={trendingPosts} addPost={setPostList} />}
+            element={
+              <MainPage
+                postList={trendingPosts}
+                setPostList={setPostList}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+                userID={userID}
+                setUserID={setUserID}
+              />
+            }
           />
           <Route
             path="/recent"
-            element={<RecentPage posts={recentPosts} addPost={setPostList} />}
+            element={
+              <RecentPage
+                postList={recentPosts}
+                setPostList={setPostList}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+                userID={userID}
+                setUserID={setUserID}
+              />
+            }
           />
           <Route
             path="/write"
-            element={<WritePage posts={postList} addPost={setPostList} />}
+            element={
+              <WritePage
+                postList={postList}
+                setPostList={setPostList}
+                isLogin={isLogin}
+                setIsLogin={setIsLogin}
+                userID={userID}
+                setUserID={setUserID}
+              />
+            }
           />
           <Route
-            path="/post/:id"
-            element={<PostPage posts={postList} setPost={setPostList} />}
+            path="/post/:userID/:id"
+            element={
+              <PostPage
+                postList={postList}
+                setPostList={setPostList}
+                userID={userID}
+              />
+            }
           />
           <Route
-            path="/write/:id"
-            element={<ModPage posts={postList} setPost={setPostList} />}
+            path="/write/:userID/:id"
+            element={
+              <ModPage
+                postList={postList}
+                setPostList={setPostList}
+                userID={userID}
+              />
+            }
           />
         </Routes>
       </div>

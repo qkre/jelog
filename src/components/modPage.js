@@ -10,10 +10,10 @@ import {
 import { Link, useLocation } from "react-router-dom";
 
 export default function ModPage(props) {
-  const { posts, setPost } = props;
+  const { postList, setPostList } = props;
 
   const postID = useLocation().pathname.split("/")[2];
-  const post = posts.find((item) => item.id === postID);
+  const post = postList.find((item) => item.id === postID);
 
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
@@ -56,11 +56,11 @@ export default function ModPage(props) {
       likesCount: post.likesCount,
       date: today.toLocaleDateString(),
     };
-    const updatedPosts = posts.map((item) =>
+    const updatedPosts = postList.map((item) =>
       item.id === postID ? modifiedPost : item
     );
 
-    setPost(updatedPosts);
+    setPostList(updatedPosts);
   };
 
   return (
