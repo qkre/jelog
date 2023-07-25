@@ -6,7 +6,6 @@ import {
   faMagnifyingGlass,
   faArrowDown,
   faClose,
-  faCheck,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
 import Modal from "react-modal";
@@ -17,7 +16,14 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 export default function Header(props) {
-  const { isLogin, setIsLogin, userID, setUserID } = props;
+  const {
+    isLogin,
+    setIsLogin,
+    userID,
+    setUserID,
+    accountList,
+    setAccountList,
+  } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
   const writeButtonRef = useRef();
@@ -36,6 +42,7 @@ export default function Header(props) {
     messageButton: useRef(),
     registerSuccessMessage: useRef(),
     userIDInputRef: useRef(),
+    alertPopUP: useRef(),
   };
 
   const showLoginModal = () => {
@@ -49,19 +56,50 @@ export default function Header(props) {
 
   const onClickLoginButton = () => {
     if (modalState === "login") {
-      setShowModal(false);
-      setIsLogin(true);
+      const foundResult = accountList.find((item) => item.account === userID);
+      if (foundResult) {
+        setUserID(userID.split("@")[0]);
+        setShowModal(false);
+        setIsLogin(true);
+      } else {
+        modalTags.alertPopUP.current.style.display = "flex";
+        showAlertPopUp();
+      }
     } else {
-      modalTags.userIDInputRef.current.style.backgroundColor =
-        "var(--velog-white-green)";
-      modalTags.userIDInputRef.current.style.color = "var(--velog-green)";
-      modalTags.userIDInputRef.current.style.fontWeight = "600";
+      if (isEmailVaild()) {
+        modalTags.userIDInputRef.current.style.backgroundColor =
+          "var(--velog-white-green)";
+        modalTags.userIDInputRef.current.style.color = "var(--velog-green)";
+        modalTags.userIDInputRef.current.style.fontWeight = "600";
 
-      modalTags.userIDInputRef.current.value =
-        "✔️ 회원가입 링크가 이메일로 전송되었습니다.";
-      modalTags.userIDInputRef.current.readOnly = "true";
-      modalTags.mainButton.current.style.display = "none";
+        modalTags.userIDInputRef.current.value =
+          "✔️ 회원가입 링크가 이메일로 전송되었습니다.";
+        modalTags.userIDInputRef.current.readOnly = "true";
+        modalTags.mainButton.current.style.display = "none";
+
+        setAccountList([
+          ...accountList,
+          { id: userID.split("@")[0], account: userID },
+        ]);
+        setUserID(null);
+        console.log(accountList);
+      } else {
+        console.log("올바른 이메일 형식이 아닙니다.");
+        modalTags.alertPopUP.current.style.display = "flex";
+        showAlertPopUp();
+      }
     }
+  };
+
+  const isEmailVaild = () => {
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^s@]+$/;
+    return emailPattern.test(userID);
+  };
+
+  const showAlertPopUp = () => {
+    setTimeout(() => {
+      modalTags.alertPopUP.current.style.display = "none";
+    }, 2000);
   };
 
   const onClickLogoutButton = () => {
@@ -134,67 +172,79 @@ export default function Header(props) {
   return (
     <div ref={headerContainerRef} className="headerContainer">
       <Modal isOpen={showModal} className="loginModal">
-        <section className="imageSection">
-          <img
-            src={require("../images/loginImage.png")}
-            alt="Login Image"
-            className="image"
-          />
-          <span className="welcomeMessage">환영합니다!</span>
-        </section>
-        <section className="loginSection">
-          <div>
-            <button
-              className="buttonCloseModal"
-              onClick={onClickCloseModalButton}
-            >
-              <FontAwesomeIcon icon={faClose} />
-            </button>
-          </div>
-          <span ref={modalTags.title} className="loginTitle">
-            로그인
-          </span>
-          <span ref={modalTags.method} className="loginMethod">
-            이메일로 로그인
-          </span>
-          <setcion className="loginInputSection">
-            <input
-              ref={modalTags.userIDInputRef}
-              className="userID"
-              type="email"
-              placeholder="이메일을 입력하세요."
-              onChange={handleUserIDChange}
+        <div className="mainContainer">
+          {" "}
+          <section className="imageSection">
+            <img
+              src={require("../images/loginImage.png")}
+              alt="Login Image"
+              className="image"
             />
-            <Link
-              ref={modalTags.mainButton}
-              to={"/"}
-              className="buttonLogin"
-              onClick={onClickLoginButton}
-            >
+            <span className="welcomeMessage">환영합니다!</span>
+          </section>
+          <section className="loginSection">
+            <div>
+              <button
+                className="buttonCloseModal"
+                onClick={onClickCloseModalButton}
+              >
+                <FontAwesomeIcon icon={faClose} />
+              </button>
+            </div>
+            <span ref={modalTags.title} className="loginTitle">
               로그인
-            </Link>
-          </setcion>
-          <span ref={modalTags.subTitle} className="loginSubTitle">
-            소셜 계정으로 로그인
-          </span>
-          <section className="loginMethodSection">
-            <FontAwesomeIcon icon={faGithub} />
-            <FontAwesomeIcon icon={faGoogle} />
-            <FontAwesomeIcon icon={faFacebook} />
-          </section>
-          <section className="registerSection">
-            <span ref={modalTags.message} className="registerMessage">
-              아직 회원이 아니신가요?
             </span>
-            <span
-              ref={modalTags.messageButton}
-              className="registerButton"
-              onClick={onClickRegisterButton}
-            >
-              회원가입
+            <span ref={modalTags.method} className="loginMethod">
+              이메일로 로그인
             </span>
+            <setcion className="loginInputSection">
+              <input
+                ref={modalTags.userIDInputRef}
+                className="userID"
+                type="email"
+                placeholder="이메일을 입력하세요."
+                onChange={handleUserIDChange}
+              />
+              <Link
+                ref={modalTags.mainButton}
+                to={"/"}
+                className="buttonLogin"
+                onClick={onClickLoginButton}
+              >
+                로그인
+              </Link>
+            </setcion>
+            <span ref={modalTags.subTitle} className="loginSubTitle">
+              소셜 계정으로 로그인
+            </span>
+            <section className="loginMethodSection">
+              <FontAwesomeIcon icon={faGithub} />
+              <FontAwesomeIcon icon={faGoogle} />
+              <FontAwesomeIcon icon={faFacebook} />
+            </section>
+            <section className="registerSection">
+              <span ref={modalTags.message} className="registerMessage">
+                아직 회원이 아니신가요?
+              </span>
+              <span
+                ref={modalTags.messageButton}
+                className="registerButton"
+                onClick={onClickRegisterButton}
+              >
+                회원가입
+              </span>
+            </section>
           </section>
-        </section>
+        </div>
+        <div ref={modalTags.alertPopUP} className="alertContainer">
+          <section className="contentSection">
+            <span className="closeAlertButton">
+              <FontAwesomeIcon icon={faClose} />
+            </span>
+            <span className="alertContent">잘못된 이메일 형식입니다.</span>
+          </section>
+          <div className="alertTimer" />
+        </div>
       </Modal>
       <section className="header">
         <div className="logos">

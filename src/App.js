@@ -11,6 +11,7 @@ function App() {
   const [postList, setPostList] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
   const [userID, setUserID] = useState();
+  const [accountList, setAccountList] = useState([]);
 
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
@@ -65,6 +66,8 @@ function App() {
           setIsLogin={setIsLogin}
           userID={userID}
           setUserID={setUserID}
+          accountList={accountList}
+          setAccountList={setAccountList}
         />
         <Routes>
           <Route
