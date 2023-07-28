@@ -8,7 +8,6 @@ import {
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-import Header from "./header";
 
 export default function MainPage(props) {
   const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =

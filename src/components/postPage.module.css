@@ -134,6 +134,14 @@ button {
   border-radius: 50%;
 }
 
+.container .mainSection .contentSection {
+  max-width: 50vw;
+}
+
+.container .mainSection .contentSection img {
+  width: 100%;
+}
+
 .container .summarySection {
   flex: 1;
   /* border: 2px solid red; */

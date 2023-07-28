@@ -105,6 +105,7 @@ export default function Header(props) {
   const onClickLogoutButton = () => {
     moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
+    console.log("logoutButton Clicked");
   };
 
   const handleUserIDChange = () => {
@@ -150,16 +151,6 @@ export default function Header(props) {
       console.log(modalTags.userIDInputRef.current);
     }
   };
-
-  useEffect(() => {
-    console.log("Loaded");
-    if (isLogin) {
-      writeButtonRef.current.classList.remove("hide");
-      userIconButtonRef.current.classList.remove("hide");
-      userMenuButtonRef.current.classList.remove("hide");
-      loginButtonRef.current.classList.add("hide");
-    }
-  }, []);
 
   useEffect(() => {
     console.log(isLogin);
@@ -263,24 +254,24 @@ export default function Header(props) {
           <Link
             ref={writeButtonRef}
             to="/write"
-            className="newPost hide"
+            className="newPost"
             onClick={() => {
               headerContainerRef.current.classList.add("hide");
             }}
           >
             새 글 작성
           </Link>
-          <button ref={userIconButtonRef} className="userIcon hide"></button>
+          <button ref={userIconButtonRef} className="userIcon"></button>
           <button
             ref={userMenuButtonRef}
-            className={"moreInfo hide"}
+            className={"moreInfo"}
             onClick={onClickMoreInfoButton}
           >
             <FontAwesomeIcon icon={faArrowDown} />
           </button>
           <button
             ref={loginButtonRef}
-            className="login"
+            className="login hide"
             onClick={showLoginModal}
           >
             로그인

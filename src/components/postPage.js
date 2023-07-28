@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
 import Modal from "react-modal";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export default function PostPage(props) {
   const { postList, setPostList, userID } = props;
@@ -46,6 +46,18 @@ export default function PostPage(props) {
 
     setPostList(updatedPosts);
   };
+
+  const parser = new DOMParser();
+  const content = parser
+    .parseFromString(post.content, "text/html")
+    .querySelector("div");
+
+  useEffect(() => {
+    console.log("Loaded");
+    const contentSection = document.querySelector("#contentSection");
+    const clonedContent = content.cloneNode(true);
+    contentSection.appendChild(clonedContent);
+  }, []);
 
   return (
     <div>
@@ -125,9 +137,10 @@ export default function PostPage(props) {
               </div>
             </div>
           </section>
-          <section className={styles.contentSection}>
-            <span>{post.content}</span>
-          </section>
+          <section
+            className={styles.contentSection}
+            id="contentSection"
+          ></section>
         </section>
         <section className={styles.summarySection}>
           <div className={styles.summaryIndexes}>

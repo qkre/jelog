@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import styles from "./writePage.module.css";
+import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -64,89 +64,85 @@ export default function ModPage(props) {
   };
 
   return (
-    <section className={styles.container}>
-      <section className={styles.inputSection}>
+    <section className={"container"}>
+      <section className={"inputSection"}>
         <div>
           <textarea
             ref={titleTextareaRef}
-            className={styles.title}
+            className={"title"}
             onChange={handleTitleChange}
             placeholder="제목을 입력하세요"
             rows={1}
           />
-          <div className={styles.titleBar} />
+          <div className={"titleBar"} />
           <input
-            className={styles.tag}
+            className={"tag"}
             type="textarea"
             placeholder="태그를 입력하세요."
           />
-          <section className={styles.buttons}>
-            <button className={styles.buttonH}>
+          <section className={"buttons"}>
+            <button className={"buttonH"}>
               H<sub>1</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>2</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>3</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>4</sub>
             </button>
-            <span className={styles.buttonBar}>|</span>
-            <button className={styles.buttonBold}>B</button>
-            <button className={styles.buttonItalic}>I</button>
-            <button className={styles.buttonDel}>
+            <span className={"buttonBar"}>|</span>
+            <button className={"buttonBold"}>B</button>
+            <button className={"buttonItalic"}>I</button>
+            <button className={"buttonDel"}>
               <del>T</del>
             </button>
-            <span className={styles.buttonBar}>|</span>
-            <button className={styles.buttonHighligt}>
+            <span className={"buttonBar"}>|</span>
+            <button className={"buttonHighligt"}>
               <FontAwesomeIcon icon={faQuoteRight} />
             </button>
-            <button className={styles.buttonURL}>
+            <button className={"buttonURL"}>
               <FontAwesomeIcon icon={faLink} />
             </button>
-            <button className={styles.buttonImage}>
+            <button className={"buttonImage"}>
               <FontAwesomeIcon icon={faImage} />
             </button>
-            <button className={styles.buttonCode}>{"<>"}</button>
+            <button className={"buttonCode"}>{"<>"}</button>
           </section>
           <textarea
             ref={contentTextareaRef}
-            className={styles.content}
+            className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onChange={handleContentChange}
           />
         </div>
-        <section className={styles.bottomSection}>
-          <Link to={"/"} className={styles.buttonExit}>
+        <section className={"bottomSection"}>
+          <Link to={"/"} className={"buttonExit"}>
             <FontAwesomeIcon icon={faArrowLeft} />
             {" 나가기"}
           </Link>
           <div>
-            <Link to={"/"} className={styles.buttonSave}>
+            <Link to={"/"} className={"buttonSave"}>
               임시저장
             </Link>
-            <Link
-              to={"/"}
-              className={styles.buttonPost}
-              onClick={handleModPost}
-            >
+            <Link to={"/"} className={"buttonPost"} onClick={handleModPost}>
               수정하기
             </Link>
           </div>
         </section>
       </section>
-      <section className={styles.previewSection}>
+      <section className={"previewSection"}>
         <textarea
           ref={previewTitleRef}
-          className={styles.previewTitle}
+          className={"previewTitle"}
           readOnly={true}
           disabled={true}
         ></textarea>
         <textarea
           ref={previewContentRef}
-          className={styles.previewContent}
+          className={"previewContent"}
           readOnly={true}
           disabled={true}
         ></textarea>

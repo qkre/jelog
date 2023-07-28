@@ -1,5 +1,5 @@
 import { useRef } from "react";
-import styles from "./writePage.module.css";
+import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
@@ -7,7 +7,7 @@ import {
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, renderMatches } from "react-router-dom";
 
 export default function WritePage(props) {
   const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
@@ -32,14 +32,14 @@ export default function WritePage(props) {
     contentTextareaRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.style.height =
-      contentTextareaRef.current.style.height;
-    previewContentRef.current.value = contentTextareaRef.current.value;
+      contentTextareaRef.current.scrollHeight + "px";
+    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
   };
 
   const handleAddPost = () => {
     const today = new Date();
     const title = titleTextareaRef.current.value;
-    const content = contentTextareaRef.current.value;
+    const content = previewContentRef.current.outerHTML;
     const newPost = {
       userID: userID,
       id: postList.length.toString(),
@@ -53,65 +53,96 @@ export default function WritePage(props) {
     headerContainer.classList.remove("hide");
   };
 
+  const focusEditor = (item, result) => {
+    console.log(item);
+    item.focus({ preventScroll: true });
+    document.execCommand("insertImage", false, `${result}`);
+  };
+
+  const insertImageDate = (file) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", function (e) {
+      focusEditor(document.querySelector(".content"), reader.result);
+    });
+    reader.readAsDataURL(file);
+  };
+
   return (
-    <section className={styles.container}>
-      <section className={styles.inputSection}>
+    <section className={"writeContainer"}>
+      <section className={"inputSection"}>
         <div>
           <textarea
             ref={titleTextareaRef}
-            className={styles.title}
+            className={"title"}
             onChange={handleTitleChange}
             placeholder="제목을 입력하세요"
             rows={1}
           />
-          <div className={styles.titleBar} />
+          <div className={"titleBar"} />
           <input
-            className={styles.tag}
+            className={"tag"}
             type="textarea"
             placeholder="태그를 입력하세요."
           />
-          <section className={styles.buttons}>
-            <button className={styles.buttonH}>
+          <section className={"buttons"}>
+            <button className={"buttonH"}>
               H<sub>1</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>2</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>3</sub>
             </button>
-            <button className={styles.buttonH}>
+            <button className={"buttonH"}>
               H<sub>4</sub>
             </button>
-            <span className={styles.buttonBar}>|</span>
-            <button className={styles.buttonBold}>B</button>
-            <button className={styles.buttonItalic}>I</button>
-            <button className={styles.buttonDel}>
+            <span className={"buttonBar"}>|</span>
+            <button className={"buttonBold"}>B</button>
+            <button className={"buttonItalic"}>I</button>
+            <button className={"buttonDel"}>
               <del>T</del>
             </button>
-            <span className={styles.buttonBar}>|</span>
-            <button className={styles.buttonHighligt}>
+            <span className={"buttonBar"}>|</span>
+            <button className={"buttonHighligt"}>
               <FontAwesomeIcon icon={faQuoteRight} />
             </button>
-            <button className={styles.buttonURL}>
+            <button className={"buttonURL"}>
               <FontAwesomeIcon icon={faLink} />
             </button>
-            <button className={styles.buttonImage}>
+            <button
+              className={"buttonImage"}
+              onClick={() => {
+                document.querySelector(".imageSelector").click();
+              }}
+            >
               <FontAwesomeIcon icon={faImage} />
             </button>
-            <button className={styles.buttonCode}>{"<>"}</button>
+            <button className={"buttonCode"}>{"<>"}</button>
           </section>
-          <textarea
+          <div
+            contentEditable="true"
             ref={contentTextareaRef}
-            className={styles.content}
+            className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
-            onChange={handleContentChange}
+            onInput={handleContentChange}
+          />
+          <input
+            className="imageSelector hide"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const files = e.target.files;
+              if (!!files) {
+                insertImageDate(files[0]);
+              }
+            }}
           />
         </div>
-        <section className={styles.bottomSection}>
+        <section className={"bottomSection"}>
           <Link
             to={"/"}
-            className={styles.buttonExit}
+            className={"buttonExit"}
             onClick={() => {
               const headerContainer =
                 document.querySelector(".headerContainer");
@@ -124,7 +155,7 @@ export default function WritePage(props) {
           <div>
             <Link
               to={"/"}
-              className={styles.buttonSave}
+              className={"buttonSave"}
               onClick={() => {
                 const headerContainer =
                   document.querySelector(".headerContainer");
@@ -133,29 +164,29 @@ export default function WritePage(props) {
             >
               임시저장
             </Link>
-            <Link
-              to={"/"}
-              className={styles.buttonPost}
-              onClick={handleAddPost}
-            >
+            <Link to={"/"} className={"buttonPost"} onClick={handleAddPost}>
               출간하기
             </Link>
           </div>
         </section>
       </section>
-      <section className={styles.previewSection}>
+      <section className={"previewSection"}>
         <textarea
           ref={previewTitleRef}
-          className={styles.previewTitle}
+          className={"previewTitle"}
           readOnly={true}
           disabled={true}
         ></textarea>
-        <textarea
+        <div
+          contentEditable
           ref={previewContentRef}
-          className={styles.previewContent}
+          className={"previewContent"}
           readOnly={true}
           disabled={true}
-        ></textarea>
+          onClick={() => {
+            console.log(document.querySelector(".previewContent"));
+          }}
+        />
       </section>
     </section>
   );
