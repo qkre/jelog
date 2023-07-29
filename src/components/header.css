@@ -5,11 +5,12 @@
 }
 
 .header {
+  padding: 10px 5%;
   /* border: 2px solid red; */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 50px;
+  margin-bottom: 20px;
 }
 
 .header .logos {

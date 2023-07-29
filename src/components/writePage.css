@@ -5,10 +5,11 @@
 
 .writeContainer .inputSection {
   width: 50%;
-  height: 95vh;
+  height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  padding: 20px;
 }
 
 .writeContainer .previewSection {
@@ -30,6 +31,7 @@ button {
   overflow: hidden;
   resize: none;
   border: none;
+  outline: none;
 }
 
 .writeContainer .inputSection .titleBar {
@@ -73,7 +75,8 @@ button {
   border: none;
   resize: none;
   width: 100%;
-  min-height: 60vh;
+  min-height: 70vh;
+  outline: none;
   overflow: hidden;
 }
 
@@ -82,10 +85,16 @@ button {
 }
 
 .writeContainer .inputSection .bottomSection {
+  position: fixed;
+  background-color: white;
+  left: 0px;
+  bottom: 0px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 50%;
   padding: 10px;
+  box-shadow: 0px 0px 5px 2px var(--velog-grey);
 }
 
 .writeContainer .inputSection .bottomSection .buttonExit {
@@ -138,4 +147,45 @@ button {
 
 .writeContainer .previewSection .previewContent img {
   max-width: 100%;
+}
+
+.loadSaveModalContainer {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+  width: 400px;
+  height: 200px;
+  box-shadow: 0px 0px 5px 2px var(--velog-grey);
+  justify-content: space-between;
+}
+
+.loadSaveModalContainer .title {
+  padding: 20px 0px;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.loadSaveModalContainer .functions {
+  padding: 20px 0px;
+  display: flex;
+  justify-content: end;
+}
+
+.loadSaveModalContainer .functions .no {
+  color: var(--velog-green);
+  padding: 5px 20px;
+  font-weight: 800;
+}
+
+.loadSaveModalContainer .functions .ok {
+  color: white;
+  background-color: var(--velog-green);
+  padding: 5px 20px;
+  font-weight: 800;
+  border-radius: 5px;
 }

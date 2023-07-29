@@ -23,6 +23,8 @@ export default function Header(props) {
     setUserID,
     accountList,
     setAccountList,
+    tempPostList,
+    setTempPostList,
   } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
@@ -57,8 +59,10 @@ export default function Header(props) {
   const onClickLoginButton = () => {
     if (modalState === "login") {
       const foundResult = accountList.find((item) => item.account === userID);
+      console.log(foundResult);
       if (foundResult) {
         setUserID(userID.split("@")[0]);
+        userIconButtonRef.current.style.backgroundColor = foundResult.userIcon;
         setShowModal(false);
         setIsLogin(true);
       } else {
@@ -77,12 +81,15 @@ export default function Header(props) {
         modalTags.userIDInputRef.current.readOnly = "true";
         modalTags.mainButton.current.style.display = "none";
 
+        const userIcon =
+          "#" + Math.round(Math.random() * 0xffffff).toString(16);
+
         setAccountList([
           ...accountList,
-          { id: userID.split("@")[0], account: userID },
+          { userID: userID.split("@")[0], account: userID, userIcon: userIcon },
         ]);
         setUserID(null);
-        console.log(accountList);
+        // console.log(accountList);
       } else {
         console.log("올바른 이메일 형식이 아닙니다.");
         modalTags.alertPopUP.current.style.display = "flex";
@@ -105,12 +112,13 @@ export default function Header(props) {
   const onClickLogoutButton = () => {
     moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
+    setUserID(undefined);
     console.log("logoutButton Clicked");
   };
 
   const handleUserIDChange = () => {
     setUserID(modalTags.userIDInputRef.current.value);
-    console.log(userID);
+    // console.log(userID);
   };
 
   const onClickMoreInfoButton = () => {
@@ -279,7 +287,15 @@ export default function Header(props) {
         </div>
         <section ref={moreInfoSectionRef} className="moreInfoSection">
           <span className="buttonMyJelog">내 젤로그</span>
-          <span className="buttonTempPost">임시 글</span>
+          <Link
+            to={"/saves"}
+            className="buttonTempPost"
+            onClick={() => {
+              console.log(tempPostList);
+            }}
+          >
+            임시 글
+          </Link>
           <span className="buttonReadList">읽기 목록</span>
           <span className="buttonSetting">설정</span>
           <Link to={"/"} className="buttonLogout" onClick={onClickLogoutButton}>

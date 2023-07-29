@@ -4,6 +4,11 @@
   --velog-white-green: rgb(168, 255, 225);
   --velog-grey: rgb(235, 235, 235);
 }
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
 
 .postBox {
   width: 30vw;
@@ -53,6 +58,7 @@
 .postBox .innerBox .content {
   padding: 10px;
   flex: 1;
+  overflow: hidden;
 }
 
 .postBox .date {
@@ -76,7 +82,6 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background-color: aqua;
   margin-right: 10px;
 }
 
@@ -84,8 +89,4 @@
   width: 30px;
   display: flex;
   justify-content: space-between;
-}
-
-.container {
-  padding: 30px 5% 30px 5%;
 }

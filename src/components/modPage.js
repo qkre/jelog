@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,25 +7,43 @@ import {
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import Modal from "react-modal";
 
 export default function ModPage(props) {
   const { postList, setPostList } = props;
 
-  const postID = useLocation().pathname.split("/")[2];
-  const post = postList.find((item) => item.id === postID);
+  const [isError, setIsError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
 
+  const userID = useLocation().pathname.split("/")[2];
+  const postID = parseInt(useLocation().pathname.split("/")[3]);
+  const post = postList.find((item) => item.id === postID);
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+  const postHTML = new DOMParser()
+    .parseFromString(post.content, "text/html")
+    .querySelector("div").innerHTML;
 
   useEffect(() => {
     titleTextareaRef.current.value = post.title;
-    contentTextareaRef.current.value = post.content;
+    contentTextareaRef.current.innerHTML = postHTML;
     previewTitleRef.current.value = post.title;
-    previewContentRef.current.value = post.content;
-  });
+    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
+    // console.log(post.content);
+    if (checkSavedPost()) {
+      setShowModal(true);
+    }
+  }, []);
+
+  const checkSavedPost = () => {
+    const result = post.savedPost !== undefined;
+    console.log(result);
+    return result;
+  };
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -34,6 +52,7 @@ export default function ModPage(props) {
     previewTitleRef.current.style.height =
       titleTextareaRef.current.scrollHeight + "px";
     previewTitleRef.current.value = titleTextareaRef.current.value;
+    errCheck();
   };
 
   const handleContentChange = () => {
@@ -41,30 +60,100 @@ export default function ModPage(props) {
     contentTextareaRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.style.height =
-      contentTextareaRef.current.style.height;
-    previewContentRef.current.value = contentTextareaRef.current.value;
+      contentTextareaRef.current.scrollHeight + "px";
+    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
+    errCheck();
   };
 
   const handleModPost = () => {
-    const today = new Date();
-    const title = titleTextareaRef.current.value;
-    const content = contentTextareaRef.current.value;
-    const modifiedPost = {
-      id: postID,
-      title: title,
-      content: content,
-      likesCount: post.likesCount,
-      date: today.toLocaleDateString(),
-    };
-    const updatedPosts = postList.map((item) =>
-      item.id === postID ? modifiedPost : item
-    );
+    if (!isError) {
+      const today = new Date();
+      const title = titleTextareaRef.current.value;
+      const content = previewContentRef.current.outerHTML;
+      const modifiedPost = {
+        userID: userID,
+        id: postID,
+        title: title,
+        content: content,
+        likesCount: post.likesCount,
+        date: today.toLocaleDateString(),
+      };
+      const updatedPostList = [...postList];
+      updatedPostList[postID] = modifiedPost;
 
-    setPostList(updatedPosts);
+      setPostList(updatedPostList);
+      navigate("/");
+    }
+  };
+
+  const handleAddSavePost = () => {
+    if (!isError) {
+      const today = new Date();
+      const title = titleTextareaRef.current.value;
+      const content = previewContentRef.current.outerHTML;
+      const modifiedPost = {
+        userID: userID,
+        id: postID,
+        title: post.title,
+        content: post.content,
+        likesCount: post.likesCount,
+        date: today.toLocaleDateString(),
+        savedPost: {
+          title: title,
+          content: content,
+        },
+      };
+
+      const updatedPostList = [...postList];
+      updatedPostList[postID] = modifiedPost;
+      setPostList(updatedPostList);
+      console.log(updatedPostList);
+    }
+  };
+
+  const errCheck = () => {
+    if (
+      previewContentRef.current.outerHTML ===
+        '<div class="previewContent"></div>' ||
+      titleTextareaRef.current.value === ""
+    ) {
+      document.querySelector(".buttonPost").removeAttribute("href");
+    } else {
+      document.querySelector(".buttonPost").setAttribute("href", "/");
+      setIsError(false);
+    }
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+  };
+
+  const loadSavedPost = () => {
+    const contentHTML = new DOMParser()
+      .parseFromString(post.savedPost.content, "text/html")
+      .querySelector("div").innerHTML;
+    titleTextareaRef.current.value = post.savedPost.title;
+    contentTextareaRef.current.innerHTML = contentHTML;
+    previewTitleRef.current.value = post.savedPost.title;
+    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
+    console.log(contentTextareaRef.current.innerHTML);
+    setShowModal(false);
   };
 
   return (
-    <section className={"container"}>
+    <section className={"writeContainer"}>
+      <Modal isOpen={showModal} className="loadSaveModalContainer">
+        <span className="title">임시 포스트 불러오기</span>
+        <span className="content">임시저장된 포스트를 불러오시겠습니까?</span>
+        <div className="functions">
+          <span className="no" onClick={closeModal}>
+            취소
+          </span>
+          <span className="ok" onClick={loadSavedPost}>
+            확인
+          </span>
+        </div>
+      </Modal>
       <section className={"inputSection"}>
         <div>
           <textarea
@@ -111,11 +200,12 @@ export default function ModPage(props) {
             </button>
             <button className={"buttonCode"}>{"<>"}</button>
           </section>
-          <textarea
+          <div
+            contentEditable="true"
             ref={contentTextareaRef}
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
-            onChange={handleContentChange}
+            onInput={handleContentChange}
           />
         </div>
         <section className={"bottomSection"}>
@@ -124,12 +214,12 @@ export default function ModPage(props) {
             {" 나가기"}
           </Link>
           <div>
-            <Link to={"/"} className={"buttonSave"}>
+            <button className={"buttonSave"} onClick={handleAddSavePost}>
               임시저장
-            </Link>
-            <Link to={"/"} className={"buttonPost"} onClick={handleModPost}>
+            </button>
+            <button className={"buttonPost"} onClick={handleModPost}>
               수정하기
-            </Link>
+            </button>
           </div>
         </section>
       </section>
@@ -140,12 +230,13 @@ export default function ModPage(props) {
           readOnly={true}
           disabled={true}
         ></textarea>
-        <textarea
+        <div
           ref={previewContentRef}
           className={"previewContent"}
-          readOnly={true}
-          disabled={true}
-        ></textarea>
+          onClick={() => {
+            console.log(document.querySelector(".previewContent"));
+          }}
+        />
       </section>
     </section>
   );

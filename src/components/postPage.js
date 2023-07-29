@@ -1,6 +1,5 @@
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import Header from "./header";
-import styles from "./postPage.module.css";
+import "./postPage.css";
 import {
   faArrowDown,
   faHeart,
@@ -12,8 +11,9 @@ import { useEffect, useRef, useState } from "react";
 
 export default function PostPage(props) {
   const { postList, setPostList, userID } = props;
-  const postID = useLocation().pathname.split("/")[3];
-  const post = postList.find((item) => item.id === postID);
+  const location = useLocation().pathname;
+  const postID = location.split("/")[3];
+  const post = postList.find((item) => item.id == postID);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
 
@@ -34,6 +34,7 @@ export default function PostPage(props) {
     const likesCount = parseInt(likesCountRef.current.innerText) + 1;
     likesCountRef.current.innerText = likesCount;
     const modifiedPost = {
+      userID: post.userID,
       id: postID,
       title: post.title,
       content: post.content,
@@ -53,97 +54,99 @@ export default function PostPage(props) {
     .querySelector("div");
 
   useEffect(() => {
-    console.log("Loaded");
+    console.log(postList);
     const contentSection = document.querySelector("#contentSection");
     const clonedContent = content.cloneNode(true);
     contentSection.appendChild(clonedContent);
+    if (location.split("/")[2] === userID) {
+      document.querySelector(".postFunctions").classList.remove("hide");
+    } else {
+      document.querySelector(".postFunctions").classList.add("hide");
+    }
   }, []);
 
   return (
     <div>
       <Modal
-        className={styles.deleteModal}
+        className={"deleteModal"}
         isOpen={isModalOpen}
         onRequestClose={closeModal}
       >
-        <span className={styles.modalTitle}>포스트 삭제</span>
-        <span className={styles.modalContent}>정말로 삭제하시겠습니까?</span>
-        <div className={styles.modalButtons}>
-          <button className={styles.buttonCancel} onClick={closeModal}>
+        <span className={"modalTitle"}>포스트 삭제</span>
+        <span className={"modalContent"}>정말로 삭제하시겠습니까?</span>
+        <div className={"modalButtons"}>
+          <button className={"buttonCancel"} onClick={closeModal}>
             취소
           </button>
           <Link
             to="/"
-            className={styles.buttonConfirm}
+            className={"buttonConfirm"}
             onClick={handleButtonConfirm}
           >
             확인
           </Link>
         </div>
       </Modal>
-      <section className={styles.container}>
-        <section className={styles.sideBarSection}>
-          <div className={styles.sideBarMenu}>
-            <button className={styles.buttonLike} onClick={onClickButtonLike}>
+      <section className={"postContainer"}>
+        <section className={"sideBarSection"}>
+          <div className={"sideBarMenu"}>
+            <button className={"buttonLike"} onClick={onClickButtonLike}>
               <FontAwesomeIcon icon={faHeart} />
             </button>
-            <span ref={likesCountRef} className={styles.likesCount}>
+            <span ref={likesCountRef} className={"likesCount"}>
               {post.likesCount}
             </span>
-            <button className={styles.buttonShare}>
+            <button className={"buttonShare"}>
               <FontAwesomeIcon icon={faShare} />
             </button>
           </div>
         </section>
-        <section className={styles.mainSection}>
-          <section className={styles.headerSection}>
-            <span className={styles.title}>{post.title}</span>
-            <section className={styles.postInfoSection}>
-              <div className={styles.userInfo}>
-                <span className={styles.userID}>user ID</span>
-                <span className={styles.uploadDate}>{post.date}</span>
+        <section className={"mainSection"}>
+          <section className={"headerSection"}>
+            <span className={"title"}>{post.title}</span>
+            <section className={"postInfoSection"}>
+              <div className={"userInfo"}>
+                <span className={userID}>user ID</span>
+                <span className={"uploadDate"}>{post.date}</span>
               </div>
-              <div className={styles.postFunctions}>
-                <span className={styles.buttonStat}>통계</span>
-                <Link to={`/write/${post.id}`} className={styles.buttonMod}>
+              <div className={"postFunctions hide"}>
+                <span className={"buttonStat"}>통계</span>
+                <Link
+                  to={`/write/${post.userID}/${post.id}`}
+                  className={"buttonMod"}
+                >
                   수정
                 </Link>
-                <span
-                  className={styles.buttonDelete}
-                  onClick={handleButtonDelete}
-                >
+                <span className={"buttonDelete"} onClick={handleButtonDelete}>
                   삭제
                 </span>
               </div>
             </section>
-            <section className={styles.tagSection}>
-              <span className={styles.tag}>Tag1</span>
-              <span className={styles.tag}>Tag2</span>
-              <span className={styles.tag}>Tag3</span>
-              <span className={styles.tag}>Tag4</span>
+            <section className={"tagSection"}>
+              <span className={"tag"}>Tag1</span>
+              <span className={"tag"}>Tag2</span>
+              <span className={"tag"}>Tag3</span>
+              <span className={"tag"}>Tag4</span>
             </section>
           </section>
-          <section className={styles.seriesSection}>
-            <span className={styles.seriesTitle}>Series Title</span>
-            <div className={styles.indicators}>
-              <button className={styles.buttonShowList}>
+          <section className={"seriesSection"}>
+            <span className={"seriesTitle"}>Series Title</span>
+            <div className={"indicators"}>
+              <button className={"buttonShowList"}>
                 <FontAwesomeIcon icon={faArrowDown} />
                 {" 목록보기"}
               </button>
-              <div className={styles.pageIndicators}>
-                <span className={styles.pages}>1 / 1</span>
-                <button className={styles.buttonBack}>{"<"}</button>
-                <button className={styles.buttonForward}>{">"}</button>
+              <div className={"pageIndicators"}>
+                <span className={"pages"}>1 / 1</span>
+                <button className={"buttonBack"}>{"<"}</button>
+                <button className={"buttonForward"}>{">"}</button>
               </div>
             </div>
           </section>
-          <section
-            className={styles.contentSection}
-            id="contentSection"
-          ></section>
+          <section className={"contentSection"} id="contentSection"></section>
         </section>
-        <section className={styles.summarySection}>
-          <div className={styles.summaryIndexes}>
+        <section className={"summarySection"}>
+          <div className={"summaryIndexes"}>
             <span>Index1</span>
             <span>Index2</span>
             <span>Index3</span>

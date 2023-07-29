@@ -1,0 +1,33 @@
+.SavePageContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px 5%;
+}
+
+.SavePageContainer > .title {
+  padding: 50px 0px;
+  font-size: 44px;
+  font-weight: 800;
+}
+
+.SavePageContainer .savePost {
+  display: flex;
+  flex-direction: column;
+}
+
+.SavePageContainer .savePost .title {
+  font-size: 20px;
+  font-weight: 600;
+  padding: 20px 0px;
+}
+
+.SavePageContainer .savePost .content {
+  padding: 10px 0px;
+}
+
+.SavePageContainer .savePost .functions {
+  padding: 10px 0px 20px 0px;
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 2px solid var(--velog-grey);
+}

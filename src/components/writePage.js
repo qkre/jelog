@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -7,16 +7,28 @@ import {
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, renderMatches } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function WritePage(props) {
-  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
-    props;
+  const {
+    postList,
+    setPostList,
+    userID,
+    savePostList,
+    setSavePostList,
+    postID,
+    setPostID,
+    savePostID,
+    setSavePostID,
+  } = props;
+
+  const navigate = useNavigate();
 
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+  const [isError, setIsError] = useState(true);
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -25,6 +37,7 @@ export default function WritePage(props) {
     previewTitleRef.current.style.height =
       titleTextareaRef.current.scrollHeight + "px";
     previewTitleRef.current.value = titleTextareaRef.current.value;
+    errCheck();
   };
 
   const handleContentChange = () => {
@@ -34,23 +47,66 @@ export default function WritePage(props) {
     previewContentRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
+    errCheck();
   };
 
   const handleAddPost = () => {
-    const today = new Date();
-    const title = titleTextareaRef.current.value;
-    const content = previewContentRef.current.outerHTML;
-    const newPost = {
-      userID: userID,
-      id: postList.length.toString(),
-      title: title,
-      content: content,
-      date: today.toLocaleDateString(),
-      likesCount: 0,
-    };
-    setPostList([...postList, newPost]);
-    const headerContainer = document.querySelector(".headerContainer");
-    headerContainer.classList.remove("hide");
+    if (!isError) {
+      const today = new Date();
+      const title = titleTextareaRef.current.value;
+      const content = previewContentRef.current.outerHTML;
+      const newPost = {
+        userID: userID,
+        id: postID,
+        title: title,
+        content: content,
+        date: today.toLocaleDateString(),
+        likesCount: 0,
+      };
+      setPostList([...postList, newPost]);
+      console.log(postList);
+      const headerContainer = document.querySelector(".headerContainer");
+      headerContainer.classList.remove("hide");
+
+      const modifiedList = [...savePostList];
+      modifiedList[savePostID] = undefined;
+
+      setSavePostList(modifiedList);
+      setPostID(postID + 1);
+      setSavePostID(parseInt(savePostID) + 1);
+
+      navigate("/");
+    }
+  };
+
+  const handleAddSavePost = () => {
+    if (!isError) {
+      const today = new Date();
+      const title = titleTextareaRef.current.value;
+      const content = previewContentRef.current.outerHTML;
+      const savePost = {
+        userID: userID,
+        id: savePostID,
+        title: title,
+        content: content,
+        date: today.toLocaleDateString(),
+        likesCount: 0,
+      };
+
+      if (savePostID > 0) {
+        const modifiedList = [...savePostList];
+        modifiedList[savePostID] = savePost;
+        setSavePostList(modifiedList);
+      } else {
+        setSavePostID(0);
+        const modifiedList = [savePost];
+        setSavePostList(modifiedList);
+      }
+
+      console.log(savePostList);
+      // setSavePostID(savePostID + 1);
+      console.log(savePostID);
+    }
   };
 
   const focusEditor = (item, result) => {
@@ -65,6 +121,19 @@ export default function WritePage(props) {
       focusEditor(document.querySelector(".content"), reader.result);
     });
     reader.readAsDataURL(file);
+  };
+
+  const errCheck = () => {
+    if (
+      previewContentRef.current.outerHTML ===
+        '<div class="previewContent"></div>' ||
+      titleTextareaRef.current.value === ""
+    ) {
+      document.querySelector(".buttonPost").removeAttribute("href");
+    } else {
+      document.querySelector(".buttonPost").setAttribute("href", "/");
+      setIsError(false);
+    }
   };
 
   return (
@@ -147,26 +216,19 @@ export default function WritePage(props) {
               const headerContainer =
                 document.querySelector(".headerContainer");
               headerContainer.classList.remove("hide");
+              setSavePostID(savePostID + 1);
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} />
             {" 나가기"}
           </Link>
           <div>
-            <Link
-              to={"/"}
-              className={"buttonSave"}
-              onClick={() => {
-                const headerContainer =
-                  document.querySelector(".headerContainer");
-                headerContainer.classList.remove("hide");
-              }}
-            >
+            <button className={"buttonSave"} onClick={handleAddSavePost}>
               임시저장
-            </Link>
-            <Link to={"/"} className={"buttonPost"} onClick={handleAddPost}>
+            </button>
+            <button className={"buttonPost"} onClick={handleAddPost}>
               출간하기
-            </Link>
+            </button>
           </div>
         </section>
       </section>
@@ -178,11 +240,8 @@ export default function WritePage(props) {
           disabled={true}
         ></textarea>
         <div
-          contentEditable
           ref={previewContentRef}
           className={"previewContent"}
-          readOnly={true}
-          disabled={true}
           onClick={() => {
             console.log(document.querySelector(".previewContent"));
           }}
