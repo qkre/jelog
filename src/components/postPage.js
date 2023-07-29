@@ -114,6 +114,11 @@ export default function PostPage(props) {
                 <Link
                   to={`/write/${post.userID}/${post.id}`}
                   className={"buttonMod"}
+                  onClick={() => {
+                    document
+                      .querySelector(".headerContainer")
+                      .classList.add("hide");
+                  }}
                 >
                   수정
                 </Link>

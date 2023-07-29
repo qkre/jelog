@@ -3,6 +3,7 @@ import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
+  faClose,
   faImage,
   faLink,
   faQuoteRight,
@@ -24,6 +25,9 @@ export default function ModPage(props) {
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+  const alertSaveRef = useRef();
+  const imageSelectorRef = useRef();
+  const buttonPostRef = useRef();
   const postHTML = new DOMParser()
     .parseFromString(post.content, "text/html")
     .querySelector("div").innerHTML;
@@ -81,6 +85,9 @@ export default function ModPage(props) {
       const updatedPostList = [...postList];
       updatedPostList[postID] = modifiedPost;
 
+      const headerContainer = document.querySelector(".headerContainer");
+      headerContainer.classList.remove("hide");
+
       setPostList(updatedPostList);
       navigate("/");
     }
@@ -108,6 +115,7 @@ export default function ModPage(props) {
       updatedPostList[postID] = modifiedPost;
       setPostList(updatedPostList);
       console.log(updatedPostList);
+      showAlertPopUp();
     }
   };
 
@@ -117,9 +125,9 @@ export default function ModPage(props) {
         '<div class="previewContent"></div>' ||
       titleTextareaRef.current.value === ""
     ) {
-      document.querySelector(".buttonPost").removeAttribute("href");
+      buttonPostRef.current.removeAttribute("href");
     } else {
-      document.querySelector(".buttonPost").setAttribute("href", "/");
+      buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);
     }
   };
@@ -140,8 +148,35 @@ export default function ModPage(props) {
     setShowModal(false);
   };
 
+  const showAlertPopUp = () => {
+    alertSaveRef.current.style.display = "flex";
+    setTimeout(() => {
+      alertSaveRef.current.style.display = "none";
+    }, 2000);
+  };
+
+  const focusEditor = (item, result) => {
+    console.log(item);
+    item.current.focus({ preventScroll: true });
+    document.execCommand("insertImage", false, `${result}`);
+  };
+
+  const insertImageDate = (file) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", function (e) {
+      focusEditor(contentTextareaRef, reader.result);
+    });
+    reader.readAsDataURL(file);
+  };
+
   return (
     <section className={"writeContainer"}>
+      <div ref={alertSaveRef} className="alertSave">
+        <span className="content">포스트가 임시저장되었습니다.</span>
+        <span className="closeButton">
+          <FontAwesomeIcon icon={faClose} />
+        </span>
+      </div>
       <Modal isOpen={showModal} className="loadSaveModalContainer">
         <span className="title">임시 포스트 불러오기</span>
         <span className="content">임시저장된 포스트를 불러오시겠습니까?</span>
@@ -195,7 +230,24 @@ export default function ModPage(props) {
             <button className={"buttonURL"}>
               <FontAwesomeIcon icon={faLink} />
             </button>
-            <button className={"buttonImage"}>
+            <button
+              className={"buttonImage"}
+              onClick={() => {
+                imageSelectorRef.current.click();
+              }}
+            >
+              <input
+                ref={imageSelectorRef}
+                className="imageSelector hide"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const files = e.target.files;
+                  if (!!files) {
+                    insertImageDate(files[0]);
+                  }
+                }}
+              />
               <FontAwesomeIcon icon={faImage} />
             </button>
             <button className={"buttonCode"}>{"<>"}</button>
@@ -209,7 +261,15 @@ export default function ModPage(props) {
           />
         </div>
         <section className={"bottomSection"}>
-          <Link to={"/"} className={"buttonExit"}>
+          <Link
+            to={"/"}
+            className={"buttonExit"}
+            onClick={() => {
+              const headerContainer =
+                document.querySelector(".headerContainer");
+              headerContainer.classList.remove("hide");
+            }}
+          >
             <FontAwesomeIcon icon={faArrowLeft} />
             {" 나가기"}
           </Link>
@@ -217,7 +277,11 @@ export default function ModPage(props) {
             <button className={"buttonSave"} onClick={handleAddSavePost}>
               임시저장
             </button>
-            <button className={"buttonPost"} onClick={handleModPost}>
+            <button
+              ref={buttonPostRef}
+              className={"buttonPost"}
+              onClick={handleModPost}
+            >
               수정하기
             </button>
           </div>
@@ -230,13 +294,7 @@ export default function ModPage(props) {
           readOnly={true}
           disabled={true}
         ></textarea>
-        <div
-          ref={previewContentRef}
-          className={"previewContent"}
-          onClick={() => {
-            console.log(document.querySelector(".previewContent"));
-          }}
-        />
+        <div ref={previewContentRef} className={"previewContent"} />
       </section>
     </section>
   );

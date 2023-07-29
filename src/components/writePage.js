@@ -3,6 +3,7 @@ import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
+  faClose,
   faImage,
   faLink,
   faQuoteRight,
@@ -28,6 +29,9 @@ export default function WritePage(props) {
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+  const alertSaveRef = useRef();
+  const imageSelectorRef = useRef();
+  const buttonPostRef = useRef();
   const [isError, setIsError] = useState(true);
 
   const handleTitleChange = () => {
@@ -106,19 +110,27 @@ export default function WritePage(props) {
       console.log(savePostList);
       // setSavePostID(savePostID + 1);
       console.log(savePostID);
+      showAlertPopUp();
     }
+  };
+
+  const showAlertPopUp = () => {
+    alertSaveRef.current.style.display = "flex";
+    setTimeout(() => {
+      alertSaveRef.current.style.display = "none";
+    }, 2000);
   };
 
   const focusEditor = (item, result) => {
     console.log(item);
-    item.focus({ preventScroll: true });
+    item.current.focus({ preventScroll: true });
     document.execCommand("insertImage", false, `${result}`);
   };
 
   const insertImageDate = (file) => {
     const reader = new FileReader();
     reader.addEventListener("load", function (e) {
-      focusEditor(document.querySelector(".content"), reader.result);
+      focusEditor(contentTextareaRef, reader.result);
     });
     reader.readAsDataURL(file);
   };
@@ -129,15 +141,21 @@ export default function WritePage(props) {
         '<div class="previewContent"></div>' ||
       titleTextareaRef.current.value === ""
     ) {
-      document.querySelector(".buttonPost").removeAttribute("href");
+      buttonPostRef.current.removeAttribute("href");
     } else {
-      document.querySelector(".buttonPost").setAttribute("href", "/");
+      buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);
     }
   };
 
   return (
     <section className={"writeContainer"}>
+      <div ref={alertSaveRef} className="alertSave hide">
+        <span className="content"> 포스트가 임시저장되었습니다.</span>
+        <span className="closeButton">
+          <FontAwesomeIcon icon={faClose} />
+        </span>
+      </div>
       <section className={"inputSection"}>
         <div>
           <textarea
@@ -155,22 +173,22 @@ export default function WritePage(props) {
           />
           <section className={"buttons"}>
             <button className={"buttonH"}>
-              H<sub>1</sub>
+              H<sub> 1</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>2</sub>
+              H<sub> 2</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>3</sub>
+              H<sub> 3</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>4</sub>
+              H<sub> 4</sub>
             </button>
             <span className={"buttonBar"}>|</span>
             <button className={"buttonBold"}>B</button>
-            <button className={"buttonItalic"}>I</button>
+            <button className={"buttonItalic"}> I</button>
             <button className={"buttonDel"}>
-              <del>T</del>
+              <del> T</del>
             </button>
             <span className={"buttonBar"}>|</span>
             <button className={"buttonHighligt"}>
@@ -182,12 +200,12 @@ export default function WritePage(props) {
             <button
               className={"buttonImage"}
               onClick={() => {
-                document.querySelector(".imageSelector").click();
+                imageSelectorRef.current.click();
               }}
             >
               <FontAwesomeIcon icon={faImage} />
             </button>
-            <button className={"buttonCode"}>{"<>"}</button>
+            <button className={"buttonCode"}> {"<>"}</button>
           </section>
           <div
             contentEditable="true"
@@ -197,11 +215,13 @@ export default function WritePage(props) {
             onInput={handleContentChange}
           />
           <input
+            ref={imageSelectorRef}
             className="imageSelector hide"
             type="file"
             accept="image/*"
             onChange={(e) => {
               const files = e.target.files;
+              console.log(files);
               if (!!files) {
                 insertImageDate(files[0]);
               }
@@ -219,14 +239,17 @@ export default function WritePage(props) {
               setSavePostID(savePostID + 1);
             }}
           >
-            <FontAwesomeIcon icon={faArrowLeft} />
-            {" 나가기"}
+            <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}
           </Link>
           <div>
             <button className={"buttonSave"} onClick={handleAddSavePost}>
               임시저장
             </button>
-            <button className={"buttonPost"} onClick={handleAddPost}>
+            <button
+              ref={buttonPostRef}
+              className={"buttonPost"}
+              onClick={handleAddPost}
+            >
               출간하기
             </button>
           </div>
