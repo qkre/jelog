@@ -90,3 +90,56 @@
   display: flex;
   justify-content: space-between;
 }
+
+.alertSave {
+  background-color: var(--velog-green);
+  width: 300px;
+  height: 70px;
+  right: 1vw;
+  top: 10px;
+  padding: 10px;
+  position: absolute;
+  display: none;
+  align-items: center;
+  transition: 3s;
+  color: white;
+}
+
+.alertSave .closeButton {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.alertPopUP {
+  background-color: rgb(255, 100, 100);
+  width: 300px;
+  height: 70px;
+  right: 1vw;
+  top: 10px;
+  position: absolute;
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: 3s;
+}
+
+.alertPopUP .contentSection {
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-around;
+}
+
+.alertPopUP .closeAlertButton {
+  width: 100%;
+  display: flex;
+  justify-content: end;
+}
+
+.alertPopUP .alertTimer {
+  height: 4px;
+  width: 100%;
+  background-color: black;
+}

@@ -13,6 +13,8 @@
 .SavePageContainer .savePost {
   display: flex;
   flex-direction: column;
+  text-decoration: none;
+  color: black;
 }
 
 .SavePageContainer .savePost .title {

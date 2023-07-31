@@ -8,8 +8,9 @@ import PostPage from "./components/postPage";
 import ModPage from "./components/modPage";
 import Header from "./components/header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faClose, faHeart } from "@fortawesome/free-solid-svg-icons";
 import SavePage from "./components/savePage";
+import SaveWritePage from "./components/saveWirtePage";
 function App() {
   const [postList, setPostList] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
@@ -106,6 +107,10 @@ function App() {
     } catch (err) {
       thumbnailJSX = React.createElement("div");
     }
+    const userInfo = accountList.find((accountInfos) => {
+      // console.log(accountInfos);
+      return accountInfos.userID === item.userID;
+    });
 
     const firstContent = Array.from(contentElement.childNodes).find(
       (item) => item.nodeName === "#text"
@@ -125,7 +130,10 @@ function App() {
         <span className="date">{item.date}</span>
         <section className="infoSection">
           <div>
-            <div className="userIcon" />
+            <div
+              className="userIcon"
+              style={{ backgroundColor: `${userInfo.userIcon}` }}
+            />
             <span className="userID">by {item.userID}</span>
           </div>
           <div className="likesCount">
@@ -143,6 +151,21 @@ function App() {
 
   return (
     <BrowserRouter>
+      <div className="alertSave">
+        <span className="content"> 포스트가 임시저장되었습니다.</span>
+        <span className="closeButton">
+          <FontAwesomeIcon icon={faClose} />
+        </span>
+      </div>
+      <div className="alertPopUP">
+        <section className="contentSection">
+          <span className="closeAlertButton">
+            <FontAwesomeIcon icon={faClose} />
+          </span>
+          <span className="alertContent">잘못된 이메일 형식입니다.</span>
+        </section>
+        <div className="alertTimer" />
+      </div>
       <Header
         posts={postList}
         addPost={setPostList}
@@ -212,6 +235,19 @@ function App() {
           }
         />
         <Route
+          path="/write/saved/:id"
+          element={
+            <SaveWritePage
+              postID={postID}
+              setPostID={setPostID}
+              postList={postList}
+              setPostList={setPostList}
+              savePostList={savePostList}
+              setSavePostList={setSavePostList}
+            />
+          }
+        />
+        <Route
           path="/write/:userID/:id"
           element={<ModPage postList={postList} setPostList={setPostList} />}
         />
@@ -219,6 +255,7 @@ function App() {
           path="/saves"
           element={
             <SavePage
+              userID={userID}
               savePostList={savePostList}
               setSavePostList={setSavePostList}
             />

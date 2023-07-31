@@ -4,25 +4,25 @@
   box-sizing: border-box;
 }
 
-.container {
+.bodyContainer {
   /* border: 2px solid red; */
-  padding: 0px 5%;
+  /* padding: 0px 5%; */
   display: flex;
   flex-direction: column;
 }
 
-.container .header {
+.bodyContainer .header {
   /* border: 2px solid blue; */
   display: flex;
   justify-content: space-between;
   margin-bottom: 30px;
 }
 
-.container .header .tags {
+.bodyContainer .header .tags {
   display: flex;
 }
 
-.container .header .tags > * {
+.bodyContainer .header .tags > * {
   display: flex;
   border: none;
   margin-right: 10px;
@@ -34,14 +34,15 @@
   color: black;
 }
 
-.container .header button {
+.bodyContainer .header button {
   border: none;
   background-color: white;
   font-size: 20px;
 }
 
-.container .body {
+.bodyContainer .body {
   /* border: 2px solid blue; */
+  padding: 0px 5%;
   display: flex;
   flex-wrap: wrap;
   /* justify-content: space-between; */

@@ -9,44 +9,43 @@ import {
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import Modal from "react-modal";
 
-export default function ModPage(props) {
-  const { postList, setPostList } = props;
+export default function SaveWritePage(props) {
+  const {
+    postID,
+    setPostID,
+    postList,
+    setPostList,
+    savePostList,
+    setSavePostList,
+  } = props;
 
-  const [isError, setIsError] = useState(false);
-  const [showModal, setShowModal] = useState(false);
+  const location = useLocation().pathname;
   const navigate = useNavigate();
 
-  const userID = useLocation().pathname.split("/")[2];
-  const postID = parseInt(useLocation().pathname.split("/")[3]);
-  const post = postList.find((item) => item.id === postID);
+  const savedPost = savePostList.find(
+    (item) => item.id === parseInt(location.split("/")[3])
+  );
+
+  const contentHTML = new DOMParser()
+    .parseFromString(savedPost.content, "text/html")
+    .querySelector("div").innerHTML;
+
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
+  const alertSaveRef = useRef();
   const imageSelectorRef = useRef();
   const buttonPostRef = useRef();
-  const postHTML = new DOMParser()
-    .parseFromString(post.content, "text/html")
-    .querySelector("div").innerHTML;
+  const [isError, setIsError] = useState(true);
 
   useEffect(() => {
-    titleTextareaRef.current.value = post.title;
-    contentTextareaRef.current.innerHTML = postHTML;
-    previewTitleRef.current.value = post.title;
-    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
-    // console.log(post.content);
-    if (checkSavedPost()) {
-      setShowModal(true);
-    }
-  }, []);
-
-  const checkSavedPost = () => {
-    const result = post.savedPost !== undefined;
-    console.log(result);
-    return result;
-  };
+    titleTextareaRef.current.value = savedPost.title;
+    contentTextareaRef.current.innerHTML = contentHTML;
+    previewTitleRef.current.value = savedPost.title;
+    previewContentRef.current.innerHTML = contentHTML;
+  });
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -68,26 +67,29 @@ export default function ModPage(props) {
     errCheck();
   };
 
-  const handleModPost = () => {
+  const handleAddPost = () => {
     if (!isError) {
       const today = new Date();
       const title = titleTextareaRef.current.value;
       const content = previewContentRef.current.outerHTML;
-      const modifiedPost = {
-        userID: userID,
+      const newPost = {
+        userID: savedPost.userID,
         id: postID,
         title: title,
         content: content,
-        likesCount: post.likesCount,
         date: today.toLocaleDateString(),
+        likesCount: 0,
       };
-      const updatedPostList = [...postList];
-      updatedPostList[postID] = modifiedPost;
-
+      setPostList([...postList, newPost]);
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
-      setPostList(updatedPostList);
+      setPostID(postID + 1);
+      const result = savePostList
+        .filter((item) => item !== savedPost)
+        .filter((item) => item !== undefined);
+
+      setSavePostList(result);
       navigate("/");
     }
   };
@@ -97,54 +99,29 @@ export default function ModPage(props) {
       const today = new Date();
       const title = titleTextareaRef.current.value;
       const content = previewContentRef.current.outerHTML;
-      const modifiedPost = {
-        userID: userID,
-        id: postID,
-        title: post.title,
-        content: post.content,
-        likesCount: post.likesCount,
+      const savePost = {
+        userID: savedPost.userID,
+        id: savedPost.id,
+        title: title,
+        content: content,
         date: today.toLocaleDateString(),
-        savedPost: {
-          title: title,
-          content: content,
-        },
+        likesCount: 0,
+        isSavedPost: true,
       };
 
-      const updatedPostList = [...postList];
-      updatedPostList[postID] = modifiedPost;
-      setPostList(updatedPostList);
-      console.log(updatedPostList);
+      if (savePost.id > 0) {
+        const modifiedList = [...savePostList];
+        modifiedList[savePost.id] = savePost;
+        setSavePostList(modifiedList);
+      } else {
+        const modifiedList = [savePost];
+        setSavePostList(modifiedList);
+      }
+
+      console.log(savePostList);
+      // setSavePostID(savePostID + 1);
       showAlertPopUp();
     }
-  };
-
-  const errCheck = () => {
-    if (
-      previewContentRef.current.outerHTML ===
-        '<div class="previewContent"></div>' ||
-      titleTextareaRef.current.value === ""
-    ) {
-      buttonPostRef.current.removeAttribute("href");
-    } else {
-      buttonPostRef.current.setAttribute("href", "/");
-      setIsError(false);
-    }
-  };
-
-  const closeModal = () => {
-    setShowModal(false);
-  };
-
-  const loadSavedPost = () => {
-    const contentHTML = new DOMParser()
-      .parseFromString(post.savedPost.content, "text/html")
-      .querySelector("div").innerHTML;
-    titleTextareaRef.current.value = post.savedPost.title;
-    contentTextareaRef.current.innerHTML = contentHTML;
-    previewTitleRef.current.value = post.savedPost.title;
-    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
-    console.log(contentTextareaRef.current.innerHTML);
-    setShowModal(false);
   };
 
   const showAlertPopUp = () => {
@@ -169,20 +146,27 @@ export default function ModPage(props) {
     reader.readAsDataURL(file);
   };
 
+  const errCheck = () => {
+    if (
+      previewContentRef.current.outerHTML ===
+        '<div class="previewContent"></div>' ||
+      titleTextareaRef.current.value === ""
+    ) {
+      buttonPostRef.current.removeAttribute("href");
+    } else {
+      buttonPostRef.current.setAttribute("href", "/");
+      setIsError(false);
+    }
+  };
+
   return (
     <section className={"writeContainer"}>
-      <Modal isOpen={showModal} className="loadSaveModalContainer">
-        <span className="title">임시 포스트 불러오기</span>
-        <span className="content">임시저장된 포스트를 불러오시겠습니까?</span>
-        <div className="functions">
-          <span className="no" onClick={closeModal}>
-            취소
-          </span>
-          <span className="ok" onClick={loadSavedPost}>
-            확인
-          </span>
-        </div>
-      </Modal>
+      <div ref={alertSaveRef} className="alertSave hide">
+        <span className="content"> 포스트가 임시저장되었습니다.</span>
+        <span className="closeButton">
+          <FontAwesomeIcon icon={faClose} />
+        </span>
+      </div>
       <section className={"inputSection"}>
         <div>
           <textarea
@@ -200,22 +184,22 @@ export default function ModPage(props) {
           />
           <section className={"buttons"}>
             <button className={"buttonH"}>
-              H<sub>1</sub>
+              H<sub> 1</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>2</sub>
+              H<sub> 2</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>3</sub>
+              H<sub> 3</sub>
             </button>
             <button className={"buttonH"}>
-              H<sub>4</sub>
+              H<sub> 4</sub>
             </button>
             <span className={"buttonBar"}>|</span>
             <button className={"buttonBold"}>B</button>
-            <button className={"buttonItalic"}>I</button>
+            <button className={"buttonItalic"}> I</button>
             <button className={"buttonDel"}>
-              <del>T</del>
+              <del> T</del>
             </button>
             <span className={"buttonBar"}>|</span>
             <button className={"buttonHighligt"}>
@@ -230,21 +214,9 @@ export default function ModPage(props) {
                 imageSelectorRef.current.click();
               }}
             >
-              <input
-                ref={imageSelectorRef}
-                className="imageSelector hide"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const files = e.target.files;
-                  if (!!files) {
-                    insertImageDate(files[0]);
-                  }
-                }}
-              />
               <FontAwesomeIcon icon={faImage} />
             </button>
-            <button className={"buttonCode"}>{"<>"}</button>
+            <button className={"buttonCode"}> {"<>"}</button>
           </section>
           <div
             contentEditable="true"
@@ -252,6 +224,19 @@ export default function ModPage(props) {
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
+          />
+          <input
+            ref={imageSelectorRef}
+            className="imageSelector hide"
+            type="file"
+            accept="image/*"
+            onChange={(e) => {
+              const files = e.target.files;
+              console.log(files);
+              if (!!files) {
+                insertImageDate(files[0]);
+              }
+            }}
           />
         </div>
         <section className={"bottomSection"}>
@@ -262,10 +247,10 @@ export default function ModPage(props) {
               const headerContainer =
                 document.querySelector(".headerContainer");
               headerContainer.classList.remove("hide");
+              //   setSavePostID(savePostID + 1);
             }}
           >
-            <FontAwesomeIcon icon={faArrowLeft} />
-            {" 나가기"}
+            <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}
           </Link>
           <div>
             <button className={"buttonSave"} onClick={handleAddSavePost}>
@@ -274,9 +259,9 @@ export default function ModPage(props) {
             <button
               ref={buttonPostRef}
               className={"buttonPost"}
-              onClick={handleModPost}
+              onClick={handleAddPost}
             >
-              수정하기
+              출간하기
             </button>
           </div>
         </section>
@@ -288,7 +273,13 @@ export default function ModPage(props) {
           readOnly={true}
           disabled={true}
         ></textarea>
-        <div ref={previewContentRef} className={"previewContent"} />
+        <div
+          ref={previewContentRef}
+          className={"previewContent"}
+          onClick={() => {
+            console.log(document.querySelector(".previewContent"));
+          }}
+        />
       </section>
     </section>
   );

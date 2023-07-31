@@ -29,9 +29,9 @@ export default function WritePage(props) {
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
-  const alertSaveRef = useRef();
   const imageSelectorRef = useRef();
   const buttonPostRef = useRef();
+
   const [isError, setIsError] = useState(true);
 
   const handleTitleChange = () => {
@@ -72,12 +72,7 @@ export default function WritePage(props) {
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
-      const modifiedList = [...savePostList];
-      modifiedList[savePostID] = undefined;
-
-      setSavePostList(modifiedList);
       setPostID(postID + 1);
-      setSavePostID(parseInt(savePostID) + 1);
 
       navigate("/");
     }
@@ -95,6 +90,7 @@ export default function WritePage(props) {
         content: content,
         date: today.toLocaleDateString(),
         likesCount: 0,
+        isSavedPost: true,
       };
 
       if (savePostID > 0) {
@@ -115,9 +111,10 @@ export default function WritePage(props) {
   };
 
   const showAlertPopUp = () => {
-    alertSaveRef.current.style.display = "flex";
+    const alertSaveRef = document.querySelector(".alertSave");
+    alertSaveRef.style.display = "flex";
     setTimeout(() => {
-      alertSaveRef.current.style.display = "none";
+      alertSaveRef.style.display = "none";
     }, 2000);
   };
 
@@ -150,12 +147,6 @@ export default function WritePage(props) {
 
   return (
     <section className={"writeContainer"}>
-      <div ref={alertSaveRef} className="alertSave hide">
-        <span className="content"> 포스트가 임시저장되었습니다.</span>
-        <span className="closeButton">
-          <FontAwesomeIcon icon={faClose} />
-        </span>
-      </div>
       <section className={"inputSection"}>
         <div>
           <textarea
