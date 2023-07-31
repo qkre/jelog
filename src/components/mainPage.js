@@ -11,8 +11,7 @@ import {
 import { Link } from "react-router-dom";
 
 export default function MainPage(props) {
-  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
-    props;
+  const { postList } = props;
   return (
     <div>
       <section className={"bodyContainer"}>

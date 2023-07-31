@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 
 export default function ModPage(props) {
-  const { postList, setPostList } = props;
+  const { USER, postList, setPostList } = props;
 
   const [isError, setIsError] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -83,6 +83,7 @@ export default function ModPage(props) {
       };
       const updatedPostList = [...postList];
       updatedPostList[postID] = modifiedPost;
+      USER.posts = updatedPostList;
 
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
@@ -112,6 +113,7 @@ export default function ModPage(props) {
 
       const updatedPostList = [...postList];
       updatedPostList[postID] = modifiedPost;
+      USER.savedPost = updatedPostList;
       setPostList(updatedPostList);
       console.log(updatedPostList);
       showAlertPopUp();

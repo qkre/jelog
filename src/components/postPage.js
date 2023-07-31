@@ -10,12 +10,16 @@ import Modal from "react-modal";
 import { useEffect, useRef, useState } from "react";
 
 export default function PostPage(props) {
-  const { postList, setPostList, userID } = props;
+  const { accountList, USER, postList, setPostList } = props;
   const location = useLocation().pathname;
+  const userID = location.split("/")[2];
   const postID = location.split("/")[3];
-  const post = postList.find((item) => item.id == postID);
+  const postUSER = accountList.find((user) => user.userID === userID);
+  const post = postUSER.posts[postID];
   const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
+  const contentSectionRef = useRef();
+  const postFunctionsRef = useRef();
 
   const handleButtonDelete = () => {
     setIsModalOpen(!isModalOpen);
@@ -24,7 +28,8 @@ export default function PostPage(props) {
     closeModal();
     const newPosts = [...postList];
     newPosts.splice(postID, 1);
-    setPostList(newPosts);
+    USER.posts = newPosts;
+    // setPostList(newPosts);
   };
   const closeModal = () => {
     setIsModalOpen(false);
@@ -54,14 +59,15 @@ export default function PostPage(props) {
     .querySelector("div");
 
   useEffect(() => {
-    console.log(postList);
-    const contentSection = document.querySelector("#contentSection");
-    const clonedContent = content.cloneNode(true);
-    contentSection.appendChild(clonedContent);
-    if (location.split("/")[2] === userID) {
-      document.querySelector(".postFunctions").classList.remove("hide");
+    contentSectionRef.current.appendChild(content);
+    if (USER === undefined) {
+      postFunctionsRef.current.classList.add("hide");
     } else {
-      document.querySelector(".postFunctions").classList.add("hide");
+      if (location.split("/")[2] === USER.userID) {
+        postFunctionsRef.current.classList.remove("hide");
+      } else {
+        postFunctionsRef.current.classList.add("hide");
+      }
     }
   }, []);
 
@@ -106,10 +112,10 @@ export default function PostPage(props) {
             <span className={"title"}>{post.title}</span>
             <section className={"postInfoSection"}>
               <div className={"userInfo"}>
-                <span className={userID}>user ID</span>
+                <span className={"userID"}>user ID</span>
                 <span className={"uploadDate"}>{post.date}</span>
               </div>
-              <div className={"postFunctions hide"}>
+              <div ref={postFunctionsRef} className={"postFunctions hide"}>
                 <span className={"buttonStat"}>통계</span>
                 <Link
                   to={`/write/${post.userID}/${post.id}`}
@@ -148,7 +154,7 @@ export default function PostPage(props) {
               </div>
             </div>
           </section>
-          <section className={"contentSection"} id="contentSection"></section>
+          <section ref={contentSectionRef}></section>
         </section>
         <section className={"summarySection"}>
           <div className={"summaryIndexes"}>

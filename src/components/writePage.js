@@ -11,17 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 export default function WritePage(props) {
-  const {
-    postList,
-    setPostList,
-    userID,
-    savePostList,
-    setSavePostList,
-    postID,
-    setPostID,
-    savePostID,
-    setSavePostID,
-  } = props;
+  const { USER, postList, setPostList, postID, setPostID } = props;
 
   const navigate = useNavigate();
 
@@ -60,15 +50,16 @@ export default function WritePage(props) {
       const title = titleTextareaRef.current.value;
       const content = previewContentRef.current.outerHTML;
       const newPost = {
-        userID: userID,
-        id: postID,
+        userID: USER.userID,
+        id: USER.postIndex,
         title: title,
         content: content,
         date: today.toLocaleDateString(),
         likesCount: 0,
       };
       setPostList([...postList, newPost]);
-      console.log(postList);
+      USER.posts.push(newPost);
+      USER.postIndex += 1;
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
@@ -84,8 +75,8 @@ export default function WritePage(props) {
       const title = titleTextareaRef.current.value;
       const content = previewContentRef.current.outerHTML;
       const savePost = {
-        userID: userID,
-        id: savePostID,
+        userID: USER.userID,
+        id: USER.saveIndex,
         title: title,
         content: content,
         date: today.toLocaleDateString(),
@@ -93,19 +84,14 @@ export default function WritePage(props) {
         isSavedPost: true,
       };
 
-      if (savePostID > 0) {
-        const modifiedList = [...savePostList];
-        modifiedList[savePostID] = savePost;
-        setSavePostList(modifiedList);
+      if (USER.saveIndex > 0) {
+        const modifiedList = [...USER.savedPost];
+        modifiedList[USER.saveIndex] = savePost;
+        USER.savedPost = modifiedList;
       } else {
-        setSavePostID(0);
-        const modifiedList = [savePost];
-        setSavePostList(modifiedList);
+        USER.savedPost.push(savePost);
       }
-
-      console.log(savePostList);
-      // setSavePostID(savePostID + 1);
-      console.log(savePostID);
+      USER.saveIndex += 1;
       showAlertPopUp();
     }
   };
@@ -227,7 +213,7 @@ export default function WritePage(props) {
               const headerContainer =
                 document.querySelector(".headerContainer");
               headerContainer.classList.remove("hide");
-              setSavePostID(savePostID + 1);
+              USER.saveIndex += 1;
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}

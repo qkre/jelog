@@ -8,8 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function RecentPage(props) {
-  const { postList, setPostList, isLogin, setIsLogin, userID, setUserID } =
-    props;
+  const { postList } = props;
   return (
     <div>
       <section className={"bodyContainer"}>

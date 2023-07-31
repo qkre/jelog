@@ -12,6 +12,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function SaveWritePage(props) {
   const {
+    USER,
     postID,
     setPostID,
     postList,
@@ -23,7 +24,7 @@ export default function SaveWritePage(props) {
   const location = useLocation().pathname;
   const navigate = useNavigate();
 
-  const savedPost = savePostList.find(
+  const savedPost = USER.savedPost.find(
     (item) => item.id === parseInt(location.split("/")[3])
   );
 
@@ -81,15 +82,16 @@ export default function SaveWritePage(props) {
         likesCount: 0,
       };
       setPostList([...postList, newPost]);
+      USER.posts.push(newPost);
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
       setPostID(postID + 1);
-      const result = savePostList
+      const result = USER.savedPost
         .filter((item) => item !== savedPost)
         .filter((item) => item !== undefined);
 
-      setSavePostList(result);
+      USER.savedPost = result;
       navigate("/");
     }
   };
@@ -109,17 +111,15 @@ export default function SaveWritePage(props) {
         isSavedPost: true,
       };
 
-      if (savePost.id > 0) {
-        const modifiedList = [...savePostList];
-        modifiedList[savePost.id] = savePost;
-        setSavePostList(modifiedList);
+      if (USER.savedPost.length > 0) {
+        const modifiedList = [...USER.savedPost];
+        modifiedList[savedPost.id] = savePost;
+        USER.savedPost = modifiedList;
       } else {
-        const modifiedList = [savePost];
-        setSavePostList(modifiedList);
+        USER.savedPost.push(savePost);
       }
 
       console.log(savePostList);
-      // setSavePostID(savePostID + 1);
       showAlertPopUp();
     }
   };

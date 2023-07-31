@@ -14,21 +14,42 @@ import SaveWritePage from "./components/saveWirtePage";
 function App() {
   const [postList, setPostList] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
-  const [userID, setUserID] = useState();
+  const [USER, setUSER] = useState();
   const [accountList, setAccountList] = useState([
     {
       userID: "t",
       account: "t",
       userIcon: "#232143",
+      posts: [],
+      savedPost: [],
+      postIndex: 0,
+      saveIndex: 0,
+    },
+    {
+      userID: "qkre",
+      account: "q",
+      userIcon: "#2fac43",
+      posts: [],
+      savedPost: [],
+      postIndex: 0,
+      saveIndex: 0,
+    },
+    {
+      userID: "asdf",
+      account: "a",
+      userIcon: "#2facff",
+      posts: [],
+      savedPost: [],
+      postIndex: 0,
+      saveIndex: 0,
     },
   ]);
-  const [savePostList, setSavePostList] = useState([]);
   const [postID, setPostID] = useState(0);
-  const [savePostID, setSavePostID] = useState(0);
 
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
   );
+
   const recentPostList = [...postList].sort((a, b) => b.id - a.id);
   const trendingPosts = trendingPostList.map((item, index) => {
     const contentElement = new DOMParser()
@@ -54,7 +75,6 @@ function App() {
     ).textContent;
 
     const userInfo = accountList.find((accountInfos) => {
-      // console.log(accountInfos);
       return accountInfos.userID === item.userID;
     });
 
@@ -145,9 +165,9 @@ function App() {
     );
   });
 
-  // useEffect(() => {
-  //   console.log(postList);
-  // }, [trendingPostList]);
+  const testButton = () => {
+    console.log(postList);
+  };
 
   return (
     <BrowserRouter>
@@ -166,52 +186,31 @@ function App() {
         </section>
         <div className="alertTimer" />
       </div>
+      <button onClick={testButton}>테스트</button>
       <Header
+        USER={USER}
+        setUSER={setUSER}
         posts={postList}
         addPost={setPostList}
         isLogin={isLogin}
         setIsLogin={setIsLogin}
-        userID={userID}
-        setUserID={setUserID}
         accountList={accountList}
         setAccountList={setAccountList}
-        savePostList={savePostList}
-        setSavePostList={setSavePostList}
       />
       <Routes>
-        <Route
-          index="index"
-          element={
-            <MainPage
-              postList={trendingPosts}
-              setPostList={setPostList}
-              isLogin={isLogin}
-              setIsLogin={setIsLogin}
-              userID={userID}
-              setUserID={setUserID}
-            />
-          }
-        />
+        <Route index="index" element={<MainPage postList={trendingPosts} />} />
         <Route
           path="/recent"
-          element={
-            <RecentPage
-              postList={recentPosts}
-              setPostList={setPostList}
-              isLogin={isLogin}
-              setIsLogin={setIsLogin}
-              userID={userID}
-              setUserID={setUserID}
-            />
-          }
+          element={<RecentPage postList={[recentPosts]} />}
         />
         <Route
           path="/post/:userID/:id"
           element={
             <PostPage
+              USER={USER}
+              accountList={accountList}
               postList={postList}
               setPostList={setPostList}
-              userID={userID}
             />
           }
         />
@@ -219,18 +218,13 @@ function App() {
           path="/write"
           element={
             <WritePage
+              USER={USER}
               postList={postList}
               setPostList={setPostList}
               isLogin={isLogin}
               setIsLogin={setIsLogin}
-              userID={userID}
-              setUserID={setUserID}
-              savePostList={savePostList}
-              setSavePostList={setSavePostList}
               postID={postID}
               setPostID={setPostID}
-              savePostID={savePostID}
-              setSavePostID={setSavePostID}
             />
           }
         />
@@ -238,29 +232,25 @@ function App() {
           path="/write/saved/:id"
           element={
             <SaveWritePage
+              USER={USER}
               postID={postID}
               setPostID={setPostID}
               postList={postList}
               setPostList={setPostList}
-              savePostList={savePostList}
-              setSavePostList={setSavePostList}
             />
           }
         />
         <Route
           path="/write/:userID/:id"
-          element={<ModPage postList={postList} setPostList={setPostList} />}
-        />
-        <Route
-          path="/saves"
           element={
-            <SavePage
-              userID={userID}
-              savePostList={savePostList}
-              setSavePostList={setSavePostList}
+            <ModPage
+              USER={USER}
+              postList={postList}
+              setPostList={setPostList}
             />
           }
         />
+        <Route path="/saves" element={<SavePage USER={USER} />} />
       </Routes>
     </BrowserRouter>
   );

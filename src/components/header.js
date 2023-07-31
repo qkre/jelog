@@ -7,7 +7,7 @@ import {
   faArrowDown,
   faClose,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 import {
   faFacebook,
@@ -17,23 +17,24 @@ import {
 
 export default function Header(props) {
   const {
+    setUSER,
     isLogin,
     setIsLogin,
-    userID,
-    setUserID,
     accountList,
     setAccountList,
     tempPostList,
-    setTempPostList,
   } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
+  const [userID, setUserID] = useState();
   const writeButtonRef = useRef();
   const userIconButtonRef = useRef();
   const userMenuButtonRef = useRef();
   const loginButtonRef = useRef();
   const moreInfoSectionRef = useRef();
   const headerContainerRef = useRef();
+
+  const navigate = useNavigate();
 
   const modalTags = {
     title: useRef(),
@@ -58,15 +59,14 @@ export default function Header(props) {
 
   const onClickLoginButton = () => {
     if (modalState === "login") {
-      const foundResult = accountList.find((item) => item.account === userID);
-      console.log(foundResult);
-      if (foundResult) {
-        setUserID(userID.split("@")[0]);
-        userIconButtonRef.current.style.backgroundColor = foundResult.userIcon;
-        setShowModal(false);
+      const result = accountList.find((item) => item.account === userID);
+      if (result) {
+        setUSER(result);
         setIsLogin(true);
+        userIconButtonRef.current.style.backgroundColor = result.userIcon;
+        setShowModal(false);
+        navigate("/");
       } else {
-        modalTags.alertPopUP.current.style.display = "flex";
         showAlertPopUp();
       }
     } else {
@@ -86,10 +86,14 @@ export default function Header(props) {
 
         setAccountList([
           ...accountList,
-          { userID: userID.split("@")[0], account: userID, userIcon: userIcon },
+          {
+            userID: userID.split("@")[0],
+            account: userID,
+            userIcon: userIcon,
+            posts: [],
+            savedPost: [],
+          },
         ]);
-        setUserID(null);
-        // console.log(accountList);
       } else {
         console.log("올바른 이메일 형식이 아닙니다.");
         showAlertPopUp();
@@ -113,13 +117,12 @@ export default function Header(props) {
   const onClickLogoutButton = () => {
     moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
-    setUserID(undefined);
+    setUSER(undefined);
     console.log("logoutButton Clicked");
   };
 
   const handleUserIDChange = () => {
     setUserID(modalTags.userIDInputRef.current.value);
-    // console.log(userID);
   };
 
   const onClickMoreInfoButton = () => {
@@ -156,13 +159,13 @@ export default function Header(props) {
       modalTags.userIDInputRef.current.value = "";
       modalTags.userIDInputRef.current.removeAttribute("readOnly");
       modalTags.mainButton.current.style.display = "";
-
-      console.log(modalTags.userIDInputRef.current);
     }
+
+    console.log("현재 모달 창 상태 :: " + modalState);
   };
 
   useEffect(() => {
-    console.log(isLogin);
+    console.log("현재 로그인 상태 : " + isLogin);
     writeButtonRef.current.classList.toggle("hide");
     userIconButtonRef.current.classList.toggle("hide");
     userMenuButtonRef.current.classList.toggle("hide");
@@ -205,14 +208,14 @@ export default function Header(props) {
                 placeholder="이메일을 입력하세요."
                 onChange={handleUserIDChange}
               />
-              <Link
+              <span
                 ref={modalTags.mainButton}
                 to={"/"}
                 className="buttonLogin"
                 onClick={onClickLoginButton}
               >
                 로그인
-              </Link>
+              </span>
             </setcion>
             <span ref={modalTags.subTitle} className="loginSubTitle">
               소셜 계정으로 로그인
