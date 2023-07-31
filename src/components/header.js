@@ -92,7 +92,6 @@ export default function Header(props) {
         // console.log(accountList);
       } else {
         console.log("올바른 이메일 형식이 아닙니다.");
-        modalTags.alertPopUP.current.style.display = "flex";
         showAlertPopUp();
       }
     }
@@ -104,8 +103,10 @@ export default function Header(props) {
   };
 
   const showAlertPopUp = () => {
+    const alertPopUP = document.querySelector(".alertPopUP");
+    alertPopUP.style.display = "flex";
     setTimeout(() => {
-      modalTags.alertPopUP.current.style.display = "none";
+      alertPopUP.style.display = "none";
     }, 2000);
   };
 
@@ -234,15 +235,6 @@ export default function Header(props) {
               </span>
             </section>
           </section>
-        </div>
-        <div ref={modalTags.alertPopUP} className="alertContainer">
-          <section className="contentSection">
-            <span className="closeAlertButton">
-              <FontAwesomeIcon icon={faClose} />
-            </span>
-            <span className="alertContent">잘못된 이메일 형식입니다.</span>
-          </section>
-          <div className="alertTimer" />
         </div>
       </Modal>
       <section className="header">

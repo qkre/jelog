@@ -102,39 +102,6 @@
   background-color: rgb(50, 50, 50);
 }
 
-.loginModal .alertContainer {
-  background-color: rgb(255, 100, 100);
-  width: 300px;
-  height: 70px;
-  right: 1vw;
-  top: 10px;
-  position: absolute;
-  display: none;
-  flex-direction: column;
-  justify-content: space-between;
-  transition: 3s;
-}
-
-.loginModal .alertContainer .contentSection {
-  padding: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: start;
-  justify-content: space-around;
-}
-
-.loginModal .alertContainer .closeAlertButton {
-  width: 100%;
-  display: flex;
-  justify-content: end;
-}
-
-.loginModal .alertContainer .alertTimer {
-  height: 4px;
-  width: 100%;
-  background-color: black;
-}
-
 .loginModal .mainContainer {
   width: 500px;
   height: 450px;
