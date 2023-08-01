@@ -12,38 +12,14 @@ import { faClose, faHeart } from "@fortawesome/free-solid-svg-icons";
 import SavePage from "./components/savePage";
 import SaveWritePage from "./components/saveWirtePage";
 function App() {
-  const [postList, setPostList] = useState([]);
+  const [postList, setPostList] = useState(
+    JSON.parse(localStorage.getItem("postList")) || []
+  );
   const [isLogin, setIsLogin] = useState(false);
   const [USER, setUSER] = useState();
-  const [accountList, setAccountList] = useState([
-    {
-      userID: "t",
-      account: "t",
-      userIcon: "#232143",
-      posts: [],
-      savedPost: [],
-      postIndex: 0,
-      saveIndex: 0,
-    },
-    {
-      userID: "qkre",
-      account: "q",
-      userIcon: "#2fac43",
-      posts: [],
-      savedPost: [],
-      postIndex: 0,
-      saveIndex: 0,
-    },
-    {
-      userID: "asdf",
-      account: "a",
-      userIcon: "#2facff",
-      posts: [],
-      savedPost: [],
-      postIndex: 0,
-      saveIndex: 0,
-    },
-  ]);
+  const [accountList, setAccountList] = useState(
+    JSON.parse(localStorage.getItem("accountList")) || []
+  );
 
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
@@ -93,13 +69,14 @@ function App() {
           <div>
             <div
               className="userIcon"
-              style={{ backgroundColor: `${userInfo.userIcon}` }}
+              style={{
+                backgroundColor: `${userInfo.userIcon}`,
+              }}
             />
             <span className="userID">by {item.userID}</span>
           </div>
           <div className="likesCount">
-            <FontAwesomeIcon icon={faHeart} />
-            {item.likesCount}
+            <FontAwesomeIcon icon={faHeart} /> {item.likesCount}
           </div>
         </section>
       </Link>
@@ -151,13 +128,14 @@ function App() {
           <div>
             <div
               className="userIcon"
-              style={{ backgroundColor: `${userInfo.userIcon}` }}
+              style={{
+                backgroundColor: `${userInfo.userIcon}`,
+              }}
             />
             <span className="userID">by {item.userID}</span>
           </div>
           <div className="likesCount">
-            <FontAwesomeIcon icon={faHeart} />
-            {item.likesCount}
+            <FontAwesomeIcon icon={faHeart} /> {item.likesCount}
           </div>
         </section>
       </Link>
@@ -165,13 +143,17 @@ function App() {
   });
 
   const testButton = () => {
-    console.log(USER);
+    console.log(postList);
+  };
+
+  const clearButton = () => {
+    localStorage.clear();
   };
 
   return (
     <BrowserRouter>
       <div className="alertSave">
-        <span className="content"> 포스트가 임시저장되었습니다.</span>
+        <span className="content">포스트가 임시저장되었습니다.</span>
         <span className="closeButton">
           <FontAwesomeIcon icon={faClose} />
         </span>
@@ -186,6 +168,7 @@ function App() {
         <div className="alertTimer" />
       </div>
       <button onClick={testButton}>테스트</button>
+      <button onClick={clearButton}>초기화</button>
       <Header
         setUSER={setUSER}
         isLogin={isLogin}

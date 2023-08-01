@@ -73,7 +73,9 @@ export default function SaveWritePage(props) {
         date: today.toLocaleDateString(),
         likesCount: 0,
       };
-      setPostList([...postList, newPost]);
+      const newPostList = [...postList, newPost];
+      setPostList(newPostList);
+      localStorage.setItem("postList", JSON.stringify(newPostList));
       USER.posts.push(newPost);
       USER.postIndex += 1;
       const headerContainer = document.querySelector(".headerContainer");
@@ -84,6 +86,9 @@ export default function SaveWritePage(props) {
       console.log(result);
 
       USER.savedPost = result;
+
+      localStorage.setItem("USER", JSON.stringify(USER));
+
       navigate("/");
     }
   };
@@ -111,7 +116,8 @@ export default function SaveWritePage(props) {
         USER.savedPost.push(savePost);
       }
 
-      console.log(savePostList);
+      localStorage.setItem("USER", JSON.stringify(USER));
+
       showAlertPopUp();
     }
   };

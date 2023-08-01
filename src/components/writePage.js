@@ -57,12 +57,14 @@ export default function WritePage(props) {
         date: today.toLocaleDateString(),
         likesCount: 0,
       };
-      setPostList([...postList, newPost]);
+      const newPostList = [...postList, newPost];
+      setPostList(newPostList);
+      localStorage.setItem("postList", JSON.stringify(newPostList));
       USER.posts.push(newPost);
       USER.postIndex += 1;
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
-
+      localStorage.setItem("USER", JSON.stringify(USER));
       navigate("/");
     }
   };
@@ -90,6 +92,7 @@ export default function WritePage(props) {
         USER.savedPost.push(savePost);
       }
       USER.saveIndex += 1;
+      localStorage.setItem("USER", JSON.stringify(USER));
       showAlertPopUp();
     }
   };

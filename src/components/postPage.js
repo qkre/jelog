@@ -13,23 +13,35 @@ export default function PostPage(props) {
   const { USER, accountList, postList, setPostList } = props;
   const location = useLocation().pathname;
   const userID = location.split("/")[2];
-  const postID = location.split("/")[3];
+  const postID = parseInt(location.split("/")[3]);
   const postUSER = accountList.find((user) => user.userID === userID);
-  const post = postUSER.posts[postID];
+  const post = postUSER.posts.find((item) => item.id === postID);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
   const contentSectionRef = useRef();
   const postFunctionsRef = useRef();
+
+  console.log(post);
 
   const handleButtonDelete = () => {
     setIsModalOpen(!isModalOpen);
   };
   const handleButtonConfirm = () => {
     closeModal();
-    const newPosts = [...postList];
-    newPosts.splice(postID, 1);
-    USER.posts = newPosts;
-    // setPostList(newPosts);
+    if (postList.length > 1) {
+      const newPosts = [...postList];
+      newPosts.splice(postID, 1);
+      setPostList(newPosts);
+      USER.posts.splice(postID, 1);
+      localStorage.setItem("USER", JSON.stringify(USER));
+      localStorage.setItem("postList", JSON.stringify(newPosts));
+    } else {
+      const newPosts = [];
+      setPostList(newPosts);
+      USER.posts = newPosts;
+      localStorage.setItem("USER", JSON.stringify(USER));
+      localStorage.setItem("postList", JSON.stringify(newPosts));
+    }
   };
   const closeModal = () => {
     setIsModalOpen(false);

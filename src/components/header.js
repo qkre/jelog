@@ -56,8 +56,10 @@ export default function Header(props) {
       if (result) {
         setUSER(result);
         setIsLogin(true);
+        setUserID(result.userID);
         userIconButtonRef.current.style.backgroundColor = result.userIcon;
         setShowModal(false);
+        localStorage.setItem("USER", JSON.stringify(result));
         navigate("/");
       } else {
         showAlertPopUp();
@@ -77,16 +79,21 @@ export default function Header(props) {
         const userIcon =
           "#" + Math.round(Math.random() * 0xffffff).toString(16);
 
-        setAccountList([
+        const newAccountList = [
           ...accountList,
           {
             userID: userID.split("@")[0],
             account: userID,
             userIcon: userIcon,
+            postIndex: 0,
             posts: [],
             savedPost: [],
           },
-        ]);
+        ];
+
+        setAccountList(newAccountList);
+        localStorage.setItem("accountList", JSON.stringify(newAccountList));
+        console.log(JSON.stringify(accountList));
       } else {
         console.log("올바른 이메일 형식이 아닙니다.");
         showAlertPopUp();
@@ -96,6 +103,7 @@ export default function Header(props) {
 
   const isEmailVaild = () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^s@]+$/;
+    if (accountList.some((item) => item.account === userID)) return false;
     return emailPattern.test(userID);
   };
 
@@ -111,6 +119,7 @@ export default function Header(props) {
     moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
     setUSER(undefined);
+    localStorage.removeItem("USER");
     console.log("logoutButton Clicked");
   };
 

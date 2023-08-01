@@ -89,6 +89,10 @@ export default function ModPage(props) {
       headerContainer.classList.remove("hide");
 
       setPostList(updatedPostList);
+      localStorage.setItem("postList", JSON.stringify(updatedPostList));
+
+      localStorage.setItem("USER", JSON.stringify(USER));
+
       navigate("/");
     }
   };
@@ -112,6 +116,9 @@ export default function ModPage(props) {
       };
 
       USER.posts[postID] = modifiedPost;
+
+      localStorage.setItem("USER", JSON.stringify(USER));
+
       showAlertPopUp();
     }
   };
