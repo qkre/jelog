@@ -44,7 +44,6 @@ function App() {
       saveIndex: 0,
     },
   ]);
-  const [postID, setPostID] = useState(0);
 
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
@@ -166,7 +165,7 @@ function App() {
   });
 
   const testButton = () => {
-    console.log(postList);
+    console.log(USER);
   };
 
   return (
@@ -188,10 +187,7 @@ function App() {
       </div>
       <button onClick={testButton}>테스트</button>
       <Header
-        USER={USER}
         setUSER={setUSER}
-        posts={postList}
-        addPost={setPostList}
         isLogin={isLogin}
         setIsLogin={setIsLogin}
         accountList={accountList}
@@ -221,10 +217,6 @@ function App() {
               USER={USER}
               postList={postList}
               setPostList={setPostList}
-              isLogin={isLogin}
-              setIsLogin={setIsLogin}
-              postID={postID}
-              setPostID={setPostID}
             />
           }
         />
@@ -233,8 +225,6 @@ function App() {
           element={
             <SaveWritePage
               USER={USER}
-              postID={postID}
-              setPostID={setPostID}
               postList={postList}
               setPostList={setPostList}
             />

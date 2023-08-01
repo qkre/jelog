@@ -11,15 +11,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function SaveWritePage(props) {
-  const {
-    USER,
-    postID,
-    setPostID,
-    postList,
-    setPostList,
-    savePostList,
-    setSavePostList,
-  } = props;
+  const { USER, postList, setPostList, savePostList } = props;
 
   const location = useLocation().pathname;
   const navigate = useNavigate();
@@ -75,7 +67,7 @@ export default function SaveWritePage(props) {
       const content = previewContentRef.current.outerHTML;
       const newPost = {
         userID: savedPost.userID,
-        id: postID,
+        id: USER.posts.length,
         title: title,
         content: content,
         date: today.toLocaleDateString(),
@@ -83,13 +75,13 @@ export default function SaveWritePage(props) {
       };
       setPostList([...postList, newPost]);
       USER.posts.push(newPost);
+      USER.postIndex += 1;
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
-      setPostID(postID + 1);
-      const result = USER.savedPost
-        .filter((item) => item !== savedPost)
-        .filter((item) => item !== undefined);
+      const result = USER.savedPost.filter((item) => item !== savedPost);
+
+      console.log(result);
 
       USER.savedPost = result;
       navigate("/");
@@ -148,11 +140,11 @@ export default function SaveWritePage(props) {
 
   const errCheck = () => {
     if (
-      previewContentRef.current.outerHTML ===
-        '<div class="previewContent"></div>' ||
+      previewContentRef.current.innerHTML === "" ||
       titleTextareaRef.current.value === ""
     ) {
       buttonPostRef.current.removeAttribute("href");
+      setIsError(true);
     } else {
       buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);

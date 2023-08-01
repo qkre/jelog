@@ -20,7 +20,7 @@ export default function ModPage(props) {
 
   const userID = useLocation().pathname.split("/")[2];
   const postID = parseInt(useLocation().pathname.split("/")[3]);
-  const post = postList.find((item) => item.id === postID);
+  const post = USER.posts[postID];
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
@@ -111,22 +111,18 @@ export default function ModPage(props) {
         },
       };
 
-      const updatedPostList = [...postList];
-      updatedPostList[postID] = modifiedPost;
-      USER.savedPost = updatedPostList;
-      setPostList(updatedPostList);
-      console.log(updatedPostList);
+      USER.posts[postID] = modifiedPost;
       showAlertPopUp();
     }
   };
 
   const errCheck = () => {
     if (
-      previewContentRef.current.outerHTML ===
-        '<div class="previewContent"></div>' ||
+      previewContentRef.current.innerHTML === "" ||
       titleTextareaRef.current.value === ""
     ) {
       buttonPostRef.current.removeAttribute("href");
+      setIsError(true);
     } else {
       buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);

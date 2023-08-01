@@ -10,7 +10,7 @@ import Modal from "react-modal";
 import { useEffect, useRef, useState } from "react";
 
 export default function PostPage(props) {
-  const { accountList, USER, postList, setPostList } = props;
+  const { USER, accountList, postList, setPostList } = props;
   const location = useLocation().pathname;
   const userID = location.split("/")[2];
   const postID = location.split("/")[3];

@@ -16,14 +16,7 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 
 export default function Header(props) {
-  const {
-    setUSER,
-    isLogin,
-    setIsLogin,
-    accountList,
-    setAccountList,
-    tempPostList,
-  } = props;
+  const { setUSER, isLogin, setIsLogin, accountList, setAccountList } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
   const [userID, setUserID] = useState();
@@ -282,13 +275,7 @@ export default function Header(props) {
         </div>
         <section ref={moreInfoSectionRef} className="moreInfoSection">
           <span className="buttonMyJelog">내 젤로그</span>
-          <Link
-            to={"/saves"}
-            className="buttonTempPost"
-            onClick={() => {
-              console.log(tempPostList);
-            }}
-          >
+          <Link to={"/saves"} className="buttonTempPost">
             임시 글
           </Link>
           <span className="buttonReadList">읽기 목록</span>

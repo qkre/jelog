@@ -11,7 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 export default function WritePage(props) {
-  const { USER, postList, setPostList, postID, setPostID } = props;
+  const { USER, postList, setPostList } = props;
 
   const navigate = useNavigate();
 
@@ -62,8 +62,6 @@ export default function WritePage(props) {
       USER.postIndex += 1;
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
-
-      setPostID(postID + 1);
 
       navigate("/");
     }
@@ -120,17 +118,16 @@ export default function WritePage(props) {
 
   const errCheck = () => {
     if (
-      previewContentRef.current.outerHTML ===
-        '<div class="previewContent"></div>' ||
+      previewContentRef.current.innerHTML === "" ||
       titleTextareaRef.current.value === ""
     ) {
       buttonPostRef.current.removeAttribute("href");
+      setIsError(true);
     } else {
       buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);
     }
   };
-
   return (
     <section className={"writeContainer"}>
       <section className={"inputSection"}>
@@ -213,7 +210,6 @@ export default function WritePage(props) {
               const headerContainer =
                 document.querySelector(".headerContainer");
               headerContainer.classList.remove("hide");
-              USER.saveIndex += 1;
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}
