@@ -11,7 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 
 export default function WritePage(props) {
-  const { USER, postList, setPostList } = props;
+  const { USER, accountList, postList, setPostList } = props;
 
   const navigate = useNavigate();
 
@@ -57,13 +57,17 @@ export default function WritePage(props) {
         date: today.toLocaleDateString(),
         likesCount: 0,
       };
+
       const newPostList = [...postList, newPost];
       setPostList(newPostList);
       localStorage.setItem("postList", JSON.stringify(newPostList));
+
       USER.posts.push(newPost);
       USER.postIndex += 1;
+
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
       navigate("/");
     }
@@ -92,6 +96,8 @@ export default function WritePage(props) {
         USER.savedPost.push(savePost);
       }
       USER.saveIndex += 1;
+      updateAccountList();
+      localStorage.setItem("accountList", JSON.stringify(accountList));
       localStorage.setItem("USER", JSON.stringify(USER));
       showAlertPopUp();
     }
@@ -131,66 +137,88 @@ export default function WritePage(props) {
       setIsError(false);
     }
   };
+
+  const updateAccountList = () => {
+    accountList.forEach((item, index) => {
+      if (item.userID === USER.userID) {
+        accountList[index] = USER;
+        return;
+      }
+    });
+    localStorage.setItem("accountList", JSON.stringify(accountList));
+  };
+
   return (
     <section className={"writeContainer"}>
+      {" "}
       <section className={"inputSection"}>
+        {" "}
         <div>
+          {" "}
           <textarea
             ref={titleTextareaRef}
             className={"title"}
             onChange={handleTitleChange}
             placeholder="제목을 입력하세요"
             rows={1}
-          />
-          <div className={"titleBar"} />
+          />{" "}
+          <div className={"titleBar"} />{" "}
           <input
             className={"tag"}
             type="textarea"
             placeholder="태그를 입력하세요."
-          />
+          />{" "}
           <section className={"buttons"}>
+            {" "}
             <button className={"buttonH"}>
+              {" "}
               H<sub> 1</sub>
-            </button>
+            </button>{" "}
             <button className={"buttonH"}>
+              {" "}
               H<sub> 2</sub>
-            </button>
+            </button>{" "}
             <button className={"buttonH"}>
+              {" "}
               H<sub> 3</sub>
-            </button>
+            </button>{" "}
             <button className={"buttonH"}>
+              {" "}
               H<sub> 4</sub>
-            </button>
+            </button>{" "}
             <span className={"buttonBar"}>|</span>
-            <button className={"buttonBold"}>B</button>
-            <button className={"buttonItalic"}> I</button>
+            <button className={"buttonBold"}>B</button>{" "}
+            <button className={"buttonItalic"}> I</button>{" "}
             <button className={"buttonDel"}>
+              {" "}
               <del> T</del>
-            </button>
+            </button>{" "}
             <span className={"buttonBar"}>|</span>
             <button className={"buttonHighligt"}>
-              <FontAwesomeIcon icon={faQuoteRight} />
-            </button>
+              <FontAwesomeIcon icon={faQuoteRight} />{" "}
+            </button>{" "}
             <button className={"buttonURL"}>
-              <FontAwesomeIcon icon={faLink} />
-            </button>
+              {" "}
+              <FontAwesomeIcon icon={faLink} />{" "}
+            </button>{" "}
             <button
               className={"buttonImage"}
               onClick={() => {
                 imageSelectorRef.current.click();
               }}
             >
-              <FontAwesomeIcon icon={faImage} />
-            </button>
+              {" "}
+              <FontAwesomeIcon icon={faImage} />{" "}
+            </button>{" "}
             <button className={"buttonCode"}> {"<>"}</button>
-          </section>
+          </section>{" "}
           <div
             contentEditable="true"
             ref={contentTextareaRef}
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
-          />
+          />{" "}
           <input
             ref={imageSelectorRef}
             className="imageSelector hide"
@@ -203,9 +231,10 @@ export default function WritePage(props) {
                 insertImageDate(files[0]);
               }
             }}
-          />
-        </div>
+          />{" "}
+        </div>{" "}
         <section className={"bottomSection"}>
+          {" "}
           <Link
             to={"/"}
             className={"buttonExit"}
@@ -215,36 +244,43 @@ export default function WritePage(props) {
               headerContainer.classList.remove("hide");
             }}
           >
+            {" "}
             <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}
           </Link>
           <div>
+            {" "}
             <button className={"buttonSave"} onClick={handleAddSavePost}>
+              {" "}
               임시저장
-            </button>
+            </button>{" "}
             <button
               ref={buttonPostRef}
               className={"buttonPost"}
               onClick={handleAddPost}
             >
+              {" "}
               출간하기
             </button>
           </div>
         </section>
-      </section>
+      </section>{" "}
       <section className={"previewSection"}>
+        {" "}
         <textarea
           ref={previewTitleRef}
           className={"previewTitle"}
           readOnly={true}
           disabled={true}
-        ></textarea>
+        >
+          {" "}
+        </textarea>{" "}
         <div
           ref={previewContentRef}
           className={"previewContent"}
           onClick={() => {
             console.log(document.querySelector(".previewContent"));
           }}
-        />
+        />{" "}
       </section>
     </section>
   );

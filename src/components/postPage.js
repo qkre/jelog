@@ -14,8 +14,9 @@ export default function PostPage(props) {
   const location = useLocation().pathname;
   const userID = location.split("/")[2];
   const postID = parseInt(location.split("/")[3]);
-  const postUSER = accountList.find((user) => user.userID === userID);
-  const post = postUSER.posts.find((item) => item.id === postID);
+  const post = postList.find(
+    (item) => item.id === postID && item.userID === userID
+  );
   const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
   const contentSectionRef = useRef();
@@ -33,12 +34,14 @@ export default function PostPage(props) {
       newPosts.splice(postID, 1);
       setPostList(newPosts);
       USER.posts.splice(postID, 1);
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
       localStorage.setItem("postList", JSON.stringify(newPosts));
     } else {
       const newPosts = [];
       setPostList(newPosts);
       USER.posts = newPosts;
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
       localStorage.setItem("postList", JSON.stringify(newPosts));
     }
@@ -83,6 +86,16 @@ export default function PostPage(props) {
     }
   }, []);
 
+  const updateAccountList = () => {
+    accountList.map((item) => {
+      if (item.userID === USER.userID) {
+        item = USER;
+        return;
+      }
+    });
+    localStorage.setItem("accountList", JSON.stringify(accountList));
+  };
+
   return (
     <div>
       <Modal
@@ -124,7 +137,7 @@ export default function PostPage(props) {
             <span className={"title"}>{post.title}</span>
             <section className={"postInfoSection"}>
               <div className={"userInfo"}>
-                <span className={"userID"}>user ID</span>
+                <span className={"userID"}>{post.userID}</span>
                 <span className={"uploadDate"}>{post.date}</span>
               </div>
               <div ref={postFunctionsRef} className={"postFunctions hide"}>

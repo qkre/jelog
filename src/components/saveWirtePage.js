@@ -11,7 +11,7 @@ import {
 import { Link, useLocation, useNavigate } from "react-router-dom";
 
 export default function SaveWritePage(props) {
-  const { USER, postList, setPostList, savePostList } = props;
+  const { USER, accountList, postList, setPostList } = props;
 
   const location = useLocation().pathname;
   const navigate = useNavigate();
@@ -81,12 +81,13 @@ export default function SaveWritePage(props) {
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
-      const result = USER.savedPost.filter((item) => item !== savedPost);
+      if (USER.savedPost.length > 1) {
+        USER.savedPost.splice(savedPost.id, 1);
+      } else {
+        USER.savedPost = [];
+      }
 
-      console.log(result);
-
-      USER.savedPost = result;
-
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
 
       navigate("/");
@@ -115,7 +116,7 @@ export default function SaveWritePage(props) {
       } else {
         USER.savedPost.push(savePost);
       }
-
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
 
       showAlertPopUp();
@@ -155,6 +156,16 @@ export default function SaveWritePage(props) {
       buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);
     }
+  };
+
+  const updateAccountList = () => {
+    accountList.forEach((item, index) => {
+      if (item.userID === USER.userID) {
+        accountList[index] = USER;
+        return;
+      }
+    });
+    localStorage.setItem("accountList", JSON.stringify(accountList));
   };
 
   return (

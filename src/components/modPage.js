@@ -12,7 +12,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
 
 export default function ModPage(props) {
-  const { USER, postList, setPostList } = props;
+  const { USER, accountList, postList, setPostList } = props;
 
   const [isError, setIsError] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -20,7 +20,7 @@ export default function ModPage(props) {
 
   const userID = useLocation().pathname.split("/")[2];
   const postID = parseInt(useLocation().pathname.split("/")[3]);
-  const post = USER.posts[postID];
+  const post = USER.posts.find((item) => item.id === postID);
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
@@ -82,15 +82,26 @@ export default function ModPage(props) {
         date: today.toLocaleDateString(),
       };
       const updatedPostList = [...postList];
-      updatedPostList[postID] = modifiedPost;
-      USER.posts = updatedPostList;
+      updatedPostList.forEach((item, index) => {
+        if (item.userID === USER.userID && item.id === postID) {
+          updatedPostList[index] = modifiedPost;
+        }
+      });
+
+      console.log(updatedPostList);
+
+      USER.posts.forEach((item, index) => {
+        if (item.id === postID) {
+          USER.posts[index] = modifiedPost;
+        }
+      });
 
       const headerContainer = document.querySelector(".headerContainer");
       headerContainer.classList.remove("hide");
 
       setPostList(updatedPostList);
       localStorage.setItem("postList", JSON.stringify(updatedPostList));
-
+      updateAccountList();
       localStorage.setItem("USER", JSON.stringify(USER));
 
       navigate("/");
@@ -172,6 +183,16 @@ export default function ModPage(props) {
       focusEditor(contentTextareaRef, reader.result);
     });
     reader.readAsDataURL(file);
+  };
+
+  const updateAccountList = () => {
+    accountList.forEach((item, index) => {
+      if (item.userID === USER.userID) {
+        accountList[index] = USER;
+        return;
+      }
+    });
+    localStorage.setItem("accountList", JSON.stringify(accountList));
   };
 
   return (

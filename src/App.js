@@ -24,8 +24,8 @@ function App() {
   const trendingPostList = [...postList].sort(
     (a, b) => b.likesCount - a.likesCount
   );
-
   const recentPostList = [...postList].sort((a, b) => b.id - a.id);
+
   const trendingPosts = trendingPostList.map((item, index) => {
     const contentElement = new DOMParser()
       .parseFromString(item.content, "text/html")
@@ -142,14 +142,6 @@ function App() {
     );
   });
 
-  const testButton = () => {
-    console.log(postList);
-  };
-
-  const clearButton = () => {
-    localStorage.clear();
-  };
-
   return (
     <BrowserRouter>
       <div className="alertSave">
@@ -167,8 +159,6 @@ function App() {
         </section>
         <div className="alertTimer" />
       </div>
-      <button onClick={testButton}>테스트</button>
-      <button onClick={clearButton}>초기화</button>
       <Header
         setUSER={setUSER}
         isLogin={isLogin}
@@ -198,6 +188,7 @@ function App() {
           element={
             <WritePage
               USER={USER}
+              accountList={accountList}
               postList={postList}
               setPostList={setPostList}
             />
@@ -208,6 +199,7 @@ function App() {
           element={
             <SaveWritePage
               USER={USER}
+              accountList={accountList}
               postList={postList}
               setPostList={setPostList}
             />
@@ -218,6 +210,7 @@ function App() {
           element={
             <ModPage
               USER={USER}
+              accountList={accountList}
               postList={postList}
               setPostList={setPostList}
             />

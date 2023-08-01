@@ -77,7 +77,7 @@ export default function Header(props) {
         modalTags.mainButton.current.style.display = "none";
 
         const userIcon =
-          "#" + Math.round(Math.random() * 0xffffff).toString(16);
+          "#" + Math.floor(Math.random() * 0xffffff).toString(16);
 
         const newAccountList = [
           ...accountList,
@@ -87,6 +87,7 @@ export default function Header(props) {
             userIcon: userIcon,
             postIndex: 0,
             posts: [],
+            saveIndex: 0,
             savedPost: [],
           },
         ];
