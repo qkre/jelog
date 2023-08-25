@@ -9,6 +9,7 @@ import {
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function WritePage(props) {
   const { USER, accountList, postList, setPostList } = props;
@@ -44,32 +45,61 @@ export default function WritePage(props) {
     errCheck();
   };
 
-  const handleAddPost = () => {
+  const uploadImage = async () => {
+    const fileInput = document.querySelector(".imageSelector");
+    const file = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post("/api/uploadImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const imageURL = response.data;
+      insertImageToEditor(imageURL);
+      console.log(response);
+      return imageURL;
+    } catch (err) {
+      console.error("Error uploadTets : ", err);
+    }
+  };
+
+  const insertImageToEditor = async (imageURL) => {
+    const imgTag = document.createElement("img");
+    imgTag.src = imageURL;
+    contentTextareaRef.current.appendChild(imgTag);
+  };
+
+  const handleAddPost = async () => {
     if (!isError) {
-      const today = new Date();
       const title = titleTextareaRef.current.value;
-      const content = previewContentRef.current.outerHTML;
-      const newPost = {
-        userID: USER.userID,
-        id: USER.postIndex,
-        title: title,
-        content: content,
-        date: today.toLocaleDateString(),
-        likesCount: 0,
-      };
+      let content = contentTextareaRef.current.outerHTML;
 
-      const newPostList = [...postList, newPost];
-      setPostList(newPostList);
-      localStorage.setItem("postList", JSON.stringify(newPostList));
+      const imgTags = contentTextareaRef.current.querySelectorAll("img");
+      for (let img of imgTags) {
+        if (img.src.startsWith("data:image/")) {
+          const imgUrl = await uploadImage(img.src);
+          content = content.replace(img.src, imgUrl);
+        }
+      }
 
-      USER.posts.push(newPost);
-      USER.postIndex += 1;
+      const publisher = USER.userID;
 
-      const headerContainer = document.querySelector(".headerContainer");
-      headerContainer.classList.remove("hide");
-      updateAccountList();
-      localStorage.setItem("USER", JSON.stringify(USER));
-      navigate("/");
+      axios
+        .post("/api/publish", {
+          title: title,
+          content: content,
+          publisher: publisher,
+        })
+        .then((res) => {
+          console.log(res);
+          document.querySelector(".headerContainer").classList.remove("hide");
+          navigate("/");
+        })
+        .catch((err) => console.log(err));
     }
   };
 
@@ -109,20 +139,6 @@ export default function WritePage(props) {
     setTimeout(() => {
       alertSaveRef.style.display = "none";
     }, 2000);
-  };
-
-  const focusEditor = (item, result) => {
-    console.log(item);
-    item.current.focus({ preventScroll: true });
-    document.execCommand("insertImage", false, `${result}`);
-  };
-
-  const insertImageDate = (file) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", function (e) {
-      focusEditor(contentTextareaRef, reader.result);
-    });
-    reader.readAsDataURL(file);
   };
 
   const errCheck = () => {
@@ -218,18 +234,16 @@ export default function WritePage(props) {
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
-          />{" "}
+          >
+            {"\n"}
+          </div>
           <input
             ref={imageSelectorRef}
             className="imageSelector hide"
             type="file"
             accept="image/*"
-            onChange={(e) => {
-              const files = e.target.files;
-              console.log(files);
-              if (!!files) {
-                insertImageDate(files[0]);
-              }
+            onChange={() => {
+              const url = uploadImage();
             }}
           />{" "}
         </div>{" "}

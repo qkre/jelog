@@ -10,7 +10,13 @@
   height: 100vh;
 }
 
-.postBox {
+.TEST {
+  width: 100%;
+  height: 100px;
+  border: 2px red solid;
+}
+
+.articleBox {
   width: 30vw;
   height: 25vh;
   min-width: 300px;
@@ -29,63 +35,63 @@
   margin: 10px 20px;
 }
 
-.postBox:hover {
+.articleBox:hover {
   transform: translateY(-5px);
   box-shadow: 0px 0px 8px 8px var(--velog-grey);
 }
 
-.postBox .innerBox {
+.articleBox .innerBox {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.postBox .innerBox .thumbnail {
+.articleBox .innerBox .thumbnail {
   width: 100%;
   background-color: white;
 }
 
-.postBox .innerBox .thumbnail img {
+.articleBox .innerBox .thumbnail img {
   width: 100%;
   max-height: 150px;
 }
 
-.postBox .innerBox .title {
+.articleBox .innerBox .title {
   padding: 10px;
   font-weight: 700;
 }
 
-.postBox .innerBox .content {
+.articleBox .innerBox .content {
   padding: 10px;
   flex: 1;
   overflow: hidden;
 }
 
-.postBox .date {
+.articleBox .date {
   padding: 10px;
   color: gray;
 }
 
-.postBox .infoSection {
+.articleBox .infoSection {
   display: flex;
   padding: 10px;
   justify-content: space-between;
   border-top: 2px solid var(--velog-grey);
 }
 
-.postBox .infoSection > div {
+.articleBox .infoSection > div {
   display: flex;
   align-items: center;
 }
 
-.postBox .infoSection .userIcon {
+.articleBox .infoSection .userIcon {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   margin-right: 10px;
 }
 
-.postBox .infoSection .likesCount {
+.articleBox .infoSection .likesCount {
   width: 30px;
   display: flex;
   justify-content: space-between;

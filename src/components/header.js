@@ -9,17 +9,15 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
-import {
-  faFacebook,
-  faGithub,
-  faGoogle,
-} from "@fortawesome/free-brands-svg-icons";
+import axios from "axios";
 
 export default function Header(props) {
-  const { setUSER, isLogin, setIsLogin, accountList, setAccountList } = props;
+  const { setUSER, isLogin, setIsLogin, accountList } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
   const [userID, setUserID] = useState();
+  const [userPW, setUserPW] = useState();
+  const [account, setAccount] = useState();
   const writeButtonRef = useRef();
   const userIconButtonRef = useRef();
   const userMenuButtonRef = useRef();
@@ -38,6 +36,7 @@ export default function Header(props) {
     messageButton: useRef(),
     registerSuccessMessage: useRef(),
     userIDInputRef: useRef(),
+    userPWInputRef: useRef(),
     alertPopUP: useRef(),
   };
 
@@ -52,52 +51,58 @@ export default function Header(props) {
 
   const onClickLoginButton = () => {
     if (modalState === "login") {
-      const result = accountList.find((item) => item.account === userID);
-      if (result) {
-        setUSER(result);
-        setIsLogin(true);
-        setUserID(result.userID);
-        userIconButtonRef.current.style.backgroundColor = result.userIcon;
-        setShowModal(false);
-        localStorage.setItem("USER", JSON.stringify(result));
-        navigate("/");
-      } else {
-        showAlertPopUp();
-      }
+      axios
+        .post("/api/login", {
+          email: userID,
+          password: userPW,
+        })
+        .then((res) => {
+          axios
+            .get(`/api/login/${userID}`)
+            .then((res) => {
+              console.log(res.data);
+              const user = res.data;
+              setUSER(user);
+              setAccount(user);
+              setIsLogin(true);
+              userIconButtonRef.current.style.backgroundColor = "";
+              setShowModal(false);
+              navigate("/");
+            })
+            .catch((err) => console.log(err));
+        })
+        .catch((err) => {
+          console.log(err);
+          showAlertPopUp();
+        });
     } else {
       if (isEmailVaild()) {
-        modalTags.userIDInputRef.current.style.backgroundColor =
-          "var(--velog-white-green)";
-        modalTags.userIDInputRef.current.style.color = "var(--velog-green)";
-        modalTags.userIDInputRef.current.style.fontWeight = "600";
-
-        modalTags.userIDInputRef.current.value =
-          "✔️ 회원가입 링크가 이메일로 전송되었습니다.";
-        modalTags.userIDInputRef.current.readOnly = "true";
-        modalTags.mainButton.current.style.display = "none";
-
         const userIcon =
           "#" + Math.floor(Math.random() * 0xffffff).toString(16);
-
-        const newAccountList = [
-          ...accountList,
-          {
+        axios
+          .post("/api/register", {
             userID: userID.split("@")[0],
-            account: userID,
-            userIcon: userIcon,
-            postIndex: 0,
-            posts: [],
-            saveIndex: 0,
-            savedPost: [],
-          },
-        ];
+            password: userPW,
+            email: userID,
+            icon: userIcon,
+          })
+          .then((res) => {
+            console.log(res);
+            modalTags.userIDInputRef.current.style.backgroundColor =
+              "var(--velog-white-green)";
+            modalTags.userIDInputRef.current.style.color = "var(--velog-green)";
+            modalTags.userIDInputRef.current.style.fontWeight = "600";
 
-        setAccountList(newAccountList);
-        localStorage.setItem("accountList", JSON.stringify(newAccountList));
-        console.log(JSON.stringify(accountList));
-      } else {
-        console.log("올바른 이메일 형식이 아닙니다.");
-        showAlertPopUp();
+            modalTags.userIDInputRef.current.value =
+              "✔️ 회원가입 링크가 이메일로 전송되었습니다.";
+            modalTags.userIDInputRef.current.readOnly = "true";
+            modalTags.userPWInputRef.current.style.display = "none";
+            modalTags.mainButton.current.style.display = "none";
+          })
+          .catch((err) => {
+            console.log(err);
+            showAlertPopUp();
+          });
       }
     }
   };
@@ -128,6 +133,10 @@ export default function Header(props) {
     setUserID(modalTags.userIDInputRef.current.value);
   };
 
+  const handleUserPWChange = () => {
+    setUserPW(modalTags.userPWInputRef.current.value);
+  };
+
   const onClickMoreInfoButton = () => {
     const curretState = moreInfoSectionRef.current.style.display;
     if (curretState !== "flex") {
@@ -143,7 +152,7 @@ export default function Header(props) {
       modalTags.title.current.innerText = "회원가입";
       modalTags.method.current.innerText = "이메일로 회원가입";
       modalTags.mainButton.current.innerText = "회원가입";
-      modalTags.subTitle.current.innerText = "소셜 계정으로 회원가입";
+      // modalTags.subTitle.current.innerText = "소셜 계정으로 회원가입";
       modalTags.message.current.innerText = "계정이 이미 있으신가요?";
       modalTags.messageButton.current.innerText = "로그인";
     } else if (modalState === "register") {
@@ -151,7 +160,7 @@ export default function Header(props) {
       modalTags.title.current.innerText = "로그인";
       modalTags.method.current.innerText = "이메일로 로그인";
       modalTags.mainButton.current.innerText = "로그인";
-      modalTags.subTitle.current.innerText = "소셜 계정으로 로그인";
+      // modalTags.subTitle.current.innerText = "소셜 계정으로 로그인";
       modalTags.message.current.innerText = "아직 회원이 아니신가요?";
       modalTags.messageButton.current.innerText = "회원가입";
 
@@ -161,6 +170,8 @@ export default function Header(props) {
 
       modalTags.userIDInputRef.current.value = "";
       modalTags.userIDInputRef.current.removeAttribute("readOnly");
+      modalTags.userPWInputRef.current.value = "";
+      modalTags.userPWInputRef.current.style.display = "";
       modalTags.mainButton.current.style.display = "";
     }
 
@@ -203,7 +214,33 @@ export default function Header(props) {
             <span ref={modalTags.method} className="loginMethod">
               이메일로 로그인
             </span>
-            <setcion className="loginInputSection">
+            {/* 로그인 인증 방법 아직 개발 안됨. 현재는 이메일 비밀번호로 로그인 */}
+            <section className="loginInputSectionTemp">
+              <input
+                ref={modalTags.userIDInputRef}
+                className="userID"
+                type="email"
+                placeholder="이메일을 입력하세요."
+                onChange={handleUserIDChange}
+              />
+              <input
+                ref={modalTags.userPWInputRef}
+                className="userPW"
+                type="password"
+                placeholder="비밀번호를 입력하세요."
+                onChange={handleUserPWChange}
+              />
+              <span
+                ref={modalTags.mainButton}
+                to={"/"}
+                className="buttonLogin"
+                onClick={onClickLoginButton}
+              >
+                로그인
+              </span>
+            </section>
+
+            {/* <setcion className="loginInputSection">
               <input
                 ref={modalTags.userIDInputRef}
                 className="userID"
@@ -219,15 +256,16 @@ export default function Header(props) {
               >
                 로그인
               </span>
-            </setcion>
-            <span ref={modalTags.subTitle} className="loginSubTitle">
+            </setcion> */}
+
+            {/* <span ref={modalTags.subTitle} className="loginSubTitle">
               소셜 계정으로 로그인
             </span>
             <section className="loginMethodSection">
               <FontAwesomeIcon icon={faGithub} />
               <FontAwesomeIcon icon={faGoogle} />
               <FontAwesomeIcon icon={faFacebook} />
-            </section>
+            </section> */}
             <section className="registerSection">
               <span ref={modalTags.message} className="registerMessage">
                 아직 회원이 아니신가요?
@@ -247,7 +285,7 @@ export default function Header(props) {
         <div className="logos">
           <Link className="logoImage">J</Link>
           <Link to={"/"} className={"logoString"}>
-            {!isLogin ? "jelog" : userID + ".log"}
+            {!isLogin ? "jelog" : account.userID + ".log"}
           </Link>
         </div>
         <div className={"buttons"}>

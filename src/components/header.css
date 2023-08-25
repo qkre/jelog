@@ -239,3 +239,41 @@
 .hide {
   display: none;
 }
+
+.loginModal .loginInputSectionTemp {
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+  height: 150px;
+}
+
+.loginModal .loginInputSectionTemp .userID {
+  width: 100%;
+  flex: 3;
+  border: 1px solid var(--velog-grey);
+  padding: 10px 15px;
+  outline: none;
+}
+
+.loginModal .loginInputSectionTemp .userPW {
+  width: 100%;
+  flex: 3;
+  border: 1px solid var(--velog-grey);
+  padding: 10px 15px;
+  outline: none;
+}
+
+.loginModal .loginInputSectionTemp .buttonLogin {
+  width: 100%;
+  flex: 3;
+  background-color: var(--velog-green);
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  cursor: pointer;
+}
