@@ -10,9 +10,10 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import imageCompression from "browser-image-compression";
 
 export default function WritePage(props) {
-  const { USER, accountList, postList, setPostList } = props;
+  const { USER, accountList } = props;
 
   const navigate = useNavigate();
 
@@ -24,6 +25,7 @@ export default function WritePage(props) {
   const buttonPostRef = useRef();
 
   const [isError, setIsError] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -42,43 +44,117 @@ export default function WritePage(props) {
     previewContentRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
+
+    contentTextareaRef.current.scrollTop =
+      contentTextareaRef.current.scrollHeight;
+
+    console.log("handleContentChange Applied");
     errCheck();
+  };
+
+  const resizeImage = async (image) => {
+    // 현재 커서 위치 저장
+    const sel = window.getSelection();
+    let savedRange;
+    if (sel.rangeCount > 0) {
+      savedRange = sel.getRangeAt(0);
+    }
+
+    setIsLoading(true);
+    const resizingBlob = await imageCompression(image, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 800,
+      useWebWorker: true,
+    });
+    setIsLoading(false);
+    const resizingFile = new File([resizingBlob], image.name, {
+      type: image.type,
+    });
+
+    // 저장한 커서 위치 복원
+    if (savedRange) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+    }
+
+    return resizingFile;
   };
 
   const uploadImage = async () => {
     const fileInput = document.querySelector(".imageSelector");
-    const file = fileInput.files[0];
+    if (fileInput.files[0]) {
+      const file = await resizeImage(fileInput.files[0]);
+      const formData = new FormData();
+      console.log(file);
+      formData.append("file", file);
 
-    const formData = new FormData();
-    formData.append("file", file);
+      try {
+        const response = await axios.post("/api/uploadImage", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const imageURL = response.data;
+        console.log("InsertImageToEditor Start");
+        await insertImageToEditor(imageURL);
+        console.log("InsertImageToEditor End");
 
-    try {
-      const response = await axios.post("/api/uploadImage", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const imageURL = response.data;
-      insertImageToEditor(imageURL);
-      console.log(response);
-      return imageURL;
-    } catch (err) {
-      console.error("Error uploadTets : ", err);
+        // handleContentChange();
+      } catch (err) {
+        console.error("Error uploadTets : ", err);
+      }
     }
   };
 
   const insertImageToEditor = async (imageURL) => {
     const imgTag = document.createElement("img");
     imgTag.src = imageURL;
-    contentTextareaRef.current.appendChild(imgTag);
+    const sel = window.getSelection();
+    let range;
+
+    // 현재 선택된 커서 위치를 가져옴.
+    if (sel.rangeCount) {
+      range = sel.getRangeAt(0);
+    }
+
+    // 커서가 contentTextareRef 내부에 있는지 확인
+    if (
+      range &&
+      contentTextareaRef.current.contains(range.commonAncestorContainer)
+    ) {
+      await range.insertNode(imgTag);
+
+      // 이미지 뒤로 커서 설정
+      range.setStartAfter(imgTag);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      // 커서가 밖에 있거나, 선택되지 않은 경우
+      await contentTextareaRef.current.appendChild(imgTag);
+
+      range = document.createRange();
+      range.setStartAfter(imgTag);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    }
+
+    const imageLoadPromise = new Promise((resolve) => {
+      imgTag.onload = resolve;
+    });
+
+    await imageLoadPromise;
+    await handleContentChange();
+    contentTextareaRef.current.focus();
   };
 
   const handleAddPost = async () => {
     if (!isError) {
       const title = titleTextareaRef.current.value;
-      let content = contentTextareaRef.current.outerHTML;
+      let content = previewContentRef.current.outerHTML;
 
-      const imgTags = contentTextareaRef.current.querySelectorAll("img");
+      const imgTags = previewContentRef.current.querySelectorAll("img");
       for (let img of imgTags) {
         if (img.src.startsWith("data:image/")) {
           const imgUrl = await uploadImage(img.src);
@@ -166,68 +242,62 @@ export default function WritePage(props) {
 
   return (
     <section className={"writeContainer"}>
-      {" "}
+      {isLoading && (
+        <div className="loadingSpinner">
+          <span className="loadingText">Uploading..</span>
+        </div>
+      )}
       <section className={"inputSection"}>
-        {" "}
         <div>
-          {" "}
           <textarea
             ref={titleTextareaRef}
             className={"title"}
             onChange={handleTitleChange}
             placeholder="제목을 입력하세요"
             rows={1}
-          />{" "}
-          <div className={"titleBar"} />{" "}
+          />
+          <div className={"titleBar"} />
           <input
             className={"tag"}
             type="textarea"
             placeholder="태그를 입력하세요."
-          />{" "}
+          />
           <section className={"buttons"}>
-            {" "}
             <button className={"buttonH"}>
-              {" "}
               H<sub> 1</sub>
-            </button>{" "}
+            </button>
             <button className={"buttonH"}>
-              {" "}
               H<sub> 2</sub>
-            </button>{" "}
+            </button>
             <button className={"buttonH"}>
-              {" "}
               H<sub> 3</sub>
-            </button>{" "}
+            </button>
             <button className={"buttonH"}>
-              {" "}
               H<sub> 4</sub>
-            </button>{" "}
+            </button>
             <span className={"buttonBar"}>|</span>
-            <button className={"buttonBold"}>B</button>{" "}
-            <button className={"buttonItalic"}> I</button>{" "}
+            <button className={"buttonBold"}>B</button>
+            <button className={"buttonItalic"}> I</button>
             <button className={"buttonDel"}>
-              {" "}
               <del> T</del>
-            </button>{" "}
+            </button>
             <span className={"buttonBar"}>|</span>
             <button className={"buttonHighligt"}>
-              <FontAwesomeIcon icon={faQuoteRight} />{" "}
-            </button>{" "}
+              <FontAwesomeIcon icon={faQuoteRight} />
+            </button>
             <button className={"buttonURL"}>
-              {" "}
-              <FontAwesomeIcon icon={faLink} />{" "}
-            </button>{" "}
+              <FontAwesomeIcon icon={faLink} />
+            </button>
             <button
               className={"buttonImage"}
               onClick={() => {
                 imageSelectorRef.current.click();
               }}
             >
-              {" "}
-              <FontAwesomeIcon icon={faImage} />{" "}
-            </button>{" "}
+              <FontAwesomeIcon icon={faImage} />
+            </button>
             <button className={"buttonCode"}> {"<>"}</button>
-          </section>{" "}
+          </section>
           <div
             contentEditable="true"
             ref={contentTextareaRef}
@@ -235,7 +305,7 @@ export default function WritePage(props) {
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
           >
-            {"\n"}
+            {""}
           </div>
           <input
             ref={imageSelectorRef}
@@ -243,12 +313,11 @@ export default function WritePage(props) {
             type="file"
             accept="image/*"
             onChange={() => {
-              const url = uploadImage();
+              uploadImage();
             }}
-          />{" "}
-        </div>{" "}
+          />
+        </div>
         <section className={"bottomSection"}>
-          {" "}
           <Link
             to={"/"}
             className={"buttonExit"}
@@ -258,43 +327,36 @@ export default function WritePage(props) {
               headerContainer.classList.remove("hide");
             }}
           >
-            {" "}
             <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}
           </Link>
           <div>
-            {" "}
             <button className={"buttonSave"} onClick={handleAddSavePost}>
-              {" "}
               임시저장
-            </button>{" "}
+            </button>
             <button
               ref={buttonPostRef}
               className={"buttonPost"}
               onClick={handleAddPost}
             >
-              {" "}
               출간하기
             </button>
           </div>
         </section>
-      </section>{" "}
+      </section>
       <section className={"previewSection"}>
-        {" "}
         <textarea
           ref={previewTitleRef}
           className={"previewTitle"}
           readOnly={true}
           disabled={true}
-        >
-          {" "}
-        </textarea>{" "}
+        ></textarea>
         <div
           ref={previewContentRef}
           className={"previewContent"}
           onClick={() => {
             console.log(document.querySelector(".previewContent"));
           }}
-        />{" "}
+        />
       </section>
     </section>
   );

@@ -24,13 +24,11 @@ export default function MainPage(props) {
       .catch((err) => console.log(err));
   }, []);
   useEffect(() => {
-    console.log(articles);
-    if (articles != undefined) {
+    if (articles !== undefined) {
       const articleList = articles.map((article) => {
         const contentElement = new DOMParser()
           .parseFromString(article.content, "text/html")
           .querySelector("div");
-
         let thumbnailJSX;
 
         try {

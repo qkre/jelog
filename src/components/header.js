@@ -229,6 +229,11 @@ export default function Header(props) {
                 type="password"
                 placeholder="비밀번호를 입력하세요."
                 onChange={handleUserPWChange}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    onClickLoginButton();
+                  }
+                }}
               />
               <span
                 ref={modalTags.mainButton}

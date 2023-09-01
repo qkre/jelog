@@ -6,60 +6,55 @@ import {
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation } from "react-router-dom";
-import Modal from "react-modal";
+
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";
 
 export default function PostPage(props) {
+  const { USER, setIsDeleteModalOpen, setDeletePostInfo } = props;
   const [articleInfo, setArticleInfo] = useState();
   const [articleElement, setArticleElement] = useState();
   const location = useLocation().pathname;
-  const userID = location.split("/")[2];
+  const publisher = location.split("/")[2];
   const articleID = parseInt(location.split("/")[3]);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const likesCountRef = useRef();
-
-  useEffect(() => {
-    axios
-      .get(`/api/articles/${userID}/${articleID}`)
-      .then((res) => setArticleInfo(res.data))
-      .catch((err) => console.log(err));
-  }, []);
 
   const createAt = (date) => {
     const createdAt = moment(date);
     return <span className="createdAt">{createdAt.fromNow()}</span>;
   };
 
+  const showModal = () => {
+    setIsDeleteModalOpen(true);
+  };
+
   useEffect(() => {
-    console.log(articleInfo);
-    if (articleInfo != undefined) {
+    axios
+      .get(`/api/articles/${publisher}/${articleID}`)
+      .then((res) => setArticleInfo(res.data))
+      .catch((err) => console.log(err));
+    setDeletePostInfo({
+      publisher,
+      articleID,
+    });
+  }, []);
+
+  useEffect(() => {
+    if (articleInfo !== undefined) {
+      let articleFunctions = "articleFunctions hide";
+
+      if (USER !== undefined && articleInfo.publisher === USER.userID) {
+        articleFunctions = articleFunctions.split(" ")[0];
+      }
+
       const contentElement = new DOMParser()
         .parseFromString(articleInfo.content, "text/html")
         .querySelector("div");
 
       const article = (
         <div>
-          <Modal
-            className={"deleteModal"}
-            isOpen={isModalOpen}
-            // onRequestClose={closeModal}
-          >
-            <span className={"modalTitle"}>포스트 삭제</span>
-            <span className={"modalContent"}>정말로 삭제하시겠습니까?</span>
-            <div className={"modalButtons"}>
-              <button className={"buttonCancel"}> 취소</button>
-              <Link
-                to="/"
-                className={"buttonConfirm"}
-                // onClick={handleButtonConfirm}
-              >
-                확인
-              </Link>
-            </div>
-          </Modal>
           <section className="articleContainer">
             <section className="sideBarSection">
               <div className="sideBarMenu">
@@ -82,10 +77,10 @@ export default function PostPage(props) {
                     <span className="publisher">{articleInfo.publisher}</span>
                     {createAt(articleInfo.createAt)}
                   </div>
-                  <div className="articleFunctions hide">
+                  <div className={articleFunctions}>
                     <span className="buttonStat">통계</span>
                     <Link
-                      to={`/write/${userID}/${articleID}`}
+                      to={`/write/${publisher}/${articleID}`}
                       className="buttonMod"
                       onClick={() => {
                         document
@@ -95,7 +90,9 @@ export default function PostPage(props) {
                     >
                       수정
                     </Link>
-                    <span className="buttonDelete">삭제</span>
+                    <span className="buttonDelete" onClick={showModal}>
+                      삭제
+                    </span>
                   </div>
                 </section>
                 <section className={"tagSection"}>

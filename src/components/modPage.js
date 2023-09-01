@@ -10,43 +10,23 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Modal from "react-modal";
+import axios from "axios";
 
 export default function ModPage(props) {
-  const { USER, accountList, postList, setPostList } = props;
+  const { USER } = props;
 
   const [isError, setIsError] = useState(false);
   const [showModal, setShowModal] = useState(false);
-  const navigate = useNavigate();
+  const [article, setArticle] = useState();
 
-  const userID = useLocation().pathname.split("/")[2];
-  const postID = parseInt(useLocation().pathname.split("/")[3]);
-  const post = USER.posts.find((item) => item.id === postID);
+  const publisher = useLocation().pathname.split("/")[2];
+  const articleID = parseInt(useLocation().pathname.split("/")[3]);
+
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
   const imageSelectorRef = useRef();
-  const buttonPostRef = useRef();
-  const postHTML = new DOMParser()
-    .parseFromString(post.content, "text/html")
-    .querySelector("div").innerHTML;
-
-  useEffect(() => {
-    titleTextareaRef.current.value = post.title;
-    contentTextareaRef.current.innerHTML = postHTML;
-    previewTitleRef.current.value = post.title;
-    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
-    // console.log(post.content);
-    if (checkSavedPost()) {
-      setShowModal(true);
-    }
-  }, []);
-
-  const checkSavedPost = () => {
-    const result = post.savedPost !== undefined;
-    console.log(result);
-    return result;
-  };
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -68,70 +48,27 @@ export default function ModPage(props) {
     errCheck();
   };
 
-  const handleModPost = () => {
-    if (!isError) {
-      const today = new Date();
-      const title = titleTextareaRef.current.value;
-      const content = previewContentRef.current.outerHTML;
-      const modifiedPost = {
-        userID: userID,
-        id: postID,
+  const handleModPost = async () => {
+    const title = titleTextareaRef.current.value;
+    let content = previewContentRef.current.outerHTML;
+
+    const imgTags = previewContentRef.current.querySelectorAll("img");
+    for (let img of imgTags) {
+      if (img.src.startsWith("data:image/")) {
+        const imgUrl = await uploadImage(img.src);
+        content = content.replace(img.src, imgUrl);
+      }
+    }
+    axios
+      .put(`/api/articles/${publisher}/${articleID}`, {
         title: title,
         content: content,
-        likesCount: post.likesCount,
-        date: today.toLocaleDateString(),
-      };
-      const updatedPostList = [...postList];
-      updatedPostList.forEach((item, index) => {
-        if (item.userID === USER.userID && item.id === postID) {
-          updatedPostList[index] = modifiedPost;
-        }
-      });
-
-      console.log(updatedPostList);
-
-      USER.posts.forEach((item, index) => {
-        if (item.id === postID) {
-          USER.posts[index] = modifiedPost;
-        }
-      });
-
-      const headerContainer = document.querySelector(".headerContainer");
-      headerContainer.classList.remove("hide");
-
-      setPostList(updatedPostList);
-      localStorage.setItem("postList", JSON.stringify(updatedPostList));
-      updateAccountList();
-      localStorage.setItem("USER", JSON.stringify(USER));
-
-      navigate("/");
-    }
-  };
-
-  const handleAddSavePost = () => {
-    if (!isError) {
-      const today = new Date();
-      const title = titleTextareaRef.current.value;
-      const content = previewContentRef.current.outerHTML;
-      const modifiedPost = {
-        userID: userID,
-        id: postID,
-        title: post.title,
-        content: post.content,
-        likesCount: post.likesCount,
-        date: today.toLocaleDateString(),
-        savedPost: {
-          title: title,
-          content: content,
-        },
-      };
-
-      USER.posts[postID] = modifiedPost;
-
-      localStorage.setItem("USER", JSON.stringify(USER));
-
-      showAlertPopUp();
-    }
+      })
+      .then((res) => {
+        console.log(res.data);
+        document.querySelector(".headerContainer").classList.remove("hide");
+      })
+      .catch((e) => console.error(e));
   };
 
   const errCheck = () => {
@@ -139,27 +76,13 @@ export default function ModPage(props) {
       previewContentRef.current.innerHTML === "" ||
       titleTextareaRef.current.value === ""
     ) {
-      buttonPostRef.current.removeAttribute("href");
       setIsError(true);
     } else {
-      buttonPostRef.current.setAttribute("href", "/");
       setIsError(false);
     }
   };
 
   const closeModal = () => {
-    setShowModal(false);
-  };
-
-  const loadSavedPost = () => {
-    const contentHTML = new DOMParser()
-      .parseFromString(post.savedPost.content, "text/html")
-      .querySelector("div").innerHTML;
-    titleTextareaRef.current.value = post.savedPost.title;
-    contentTextareaRef.current.innerHTML = contentHTML;
-    previewTitleRef.current.value = post.savedPost.title;
-    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
-    console.log(contentTextareaRef.current.innerHTML);
     setShowModal(false);
   };
 
@@ -171,29 +94,71 @@ export default function ModPage(props) {
     }, 2000);
   };
 
-  const focusEditor = (item, result) => {
-    console.log(item);
-    item.current.focus({ preventScroll: true });
-    document.execCommand("insertImage", false, `${result}`);
+  const uploadImage = async () => {
+    const fileInput = document.querySelector(".imageSelector");
+    const file = fileInput.files[0];
+
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      const response = await axios.post("/api/uploadImage", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+      const imageURL = response.data;
+      insertImageToEditor(imageURL);
+      console.log(response);
+      return imageURL;
+    } catch (err) {
+      console.error("Error uploadTets : ", err);
+    }
   };
 
-  const insertImageDate = (file) => {
-    const reader = new FileReader();
-    reader.addEventListener("load", function (e) {
-      focusEditor(contentTextareaRef, reader.result);
-    });
-    reader.readAsDataURL(file);
+  const insertImageToEditor = async (imageURL) => {
+    const imgTag = document.createElement("img");
+    imgTag.src = imageURL;
+
+    const sel = window.getSelection();
+    // 현재 선택된 커서 위치를 가져옴.
+    if (sel.rangeCount) {
+      const range = sel.getRangeAt(0);
+
+      range.insertNode(imgTag);
+
+      // 이미지 뒤로 커서 설정
+      range.setStartAfter(imgTag);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
+    } else {
+      // 선택된 커서 영역이 없는 경우, 그냥 마지막에 추가
+      contentTextareaRef.current.appendChild(imgTag);
+    }
   };
 
-  const updateAccountList = () => {
-    accountList.forEach((item, index) => {
-      if (item.userID === USER.userID) {
-        accountList[index] = USER;
-        return;
-      }
-    });
-    localStorage.setItem("accountList", JSON.stringify(accountList));
-  };
+  useEffect(() => {
+    axios
+      .get(`/api/articles/${publisher}/${articleID}`)
+      .then((res) => setArticle(res.data))
+      .catch((e) => console.error("Error Occured on load ModPage :: " + e));
+  }, []);
+
+  useEffect(() => {
+    if (article !== undefined) {
+      titleTextareaRef.current.innerText = article.title;
+      const contentElement = new DOMParser()
+        .parseFromString(article.content, "text/html")
+        .querySelector("div");
+
+      console.log(contentElement);
+
+      contentTextareaRef.current.innerHTML = contentElement.innerHTML;
+      handleTitleChange();
+      handleContentChange();
+    }
+  }, [article]);
 
   return (
     <section className={"writeContainer"}>
@@ -204,9 +169,7 @@ export default function ModPage(props) {
           <span className="no" onClick={closeModal}>
             취소
           </span>
-          <span className="ok" onClick={loadSavedPost}>
-            확인
-          </span>
+          <span className="ok">확인</span>
         </div>
       </Modal>
       <section className={"inputSection"}>
@@ -256,18 +219,6 @@ export default function ModPage(props) {
                 imageSelectorRef.current.click();
               }}
             >
-              <input
-                ref={imageSelectorRef}
-                className="imageSelector hide"
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const files = e.target.files;
-                  if (!!files) {
-                    insertImageDate(files[0]);
-                  }
-                }}
-              />
               <FontAwesomeIcon icon={faImage} />
             </button>
             <button className={"buttonCode"}>{"<>"}</button>
@@ -278,6 +229,15 @@ export default function ModPage(props) {
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
+          />
+          <input
+            ref={imageSelectorRef}
+            className="imageSelector hide"
+            type="file"
+            accept="image/*"
+            onChange={() => {
+              const url = uploadImage();
+            }}
           />
         </div>
         <section className={"bottomSection"}>
@@ -294,16 +254,10 @@ export default function ModPage(props) {
             {" 나가기"}
           </Link>
           <div>
-            <button className={"buttonSave"} onClick={handleAddSavePost}>
-              임시저장
-            </button>
-            <button
-              ref={buttonPostRef}
-              className={"buttonPost"}
-              onClick={handleModPost}
-            >
+            <button className={"buttonSave"}>임시저장</button>
+            <Link to={"/"} className={"buttonPost"} onClick={handleModPost}>
               수정하기
-            </button>
+            </Link>
           </div>
         </section>
       </section>
