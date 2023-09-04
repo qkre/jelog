@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowTrendUp,
   faClock,
-  faClose,
   faArrowDown,
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
@@ -14,12 +13,14 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function RecentPage() {
+  const URL = "http://118.67.132.220:8080";
+
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
   useEffect(() => {
     axios
-      .get("/api/articles")
+      .get(`${URL}/api/articles`)
       .then((res) => {
         const sortedArticles = res.data;
         sortedArticles.sort((a, b) => {

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
@@ -13,10 +13,15 @@ import axios from "axios";
 import imageCompression from "browser-image-compression";
 
 export default function WritePage(props) {
+  const URL = "http://118.67.132.220:8080";
+
   const { USER, accountList } = props;
+  const [tagList, setTagList] = useState([]);
+  const [tagElement, setTagElement] = useState([]);
 
   const navigate = useNavigate();
 
+  const tagTextareaRef = useRef();
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
@@ -26,6 +31,31 @@ export default function WritePage(props) {
 
   const [isError, setIsError] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+
+  const deleteTag = (e) => {
+    const modifiedTagList = tagList.filter((tag) => tag !== e.target.innerText);
+    console.log(modifiedTagList);
+    setTagList(modifiedTagList);
+  };
+
+  const handleTagChange = () => {
+    const tags = tagTextareaRef.current.value.split(" ");
+    const mergedTagList = [...tagList, ...tags];
+    const uniqueTagList = [...new Set(mergedTagList)];
+    setTagList(uniqueTagList);
+    tagTextareaRef.current.value = "";
+  };
+
+  useEffect(() => {
+    const newTagElement = tagList.map((tag) => {
+      return (
+        <div className="tag" onClick={deleteTag}>
+          {tag}
+        </div>
+      );
+    });
+    setTagElement(newTagElement);
+  }, [tagList]);
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -53,6 +83,7 @@ export default function WritePage(props) {
   };
 
   const resizeImage = async (image) => {
+    if (image.type == "image/gif") return image;
     // 현재 커서 위치 저장
     const sel = window.getSelection();
     let savedRange;
@@ -89,7 +120,7 @@ export default function WritePage(props) {
       formData.append("file", file);
 
       try {
-        const response = await axios.post("/api/uploadImage", formData, {
+        const response = await axios.post(`${URL}/api/uploadImage`, formData, {
           headers: {
             "Content-Type": "multipart/form-data",
           },
@@ -164,11 +195,14 @@ export default function WritePage(props) {
 
       const publisher = USER.userID;
 
+      console.log(tagList);
+
       axios
-        .post("/api/publish", {
+        .post(`${URL}/api/publish`, {
           title: title,
           content: content,
           publisher: publisher,
+          tags: tagList.toString(),
         })
         .then((res) => {
           console.log(res);
@@ -202,7 +236,6 @@ export default function WritePage(props) {
         USER.savedPost.push(savePost);
       }
       USER.saveIndex += 1;
-      updateAccountList();
       localStorage.setItem("accountList", JSON.stringify(accountList));
       localStorage.setItem("USER", JSON.stringify(USER));
       showAlertPopUp();
@@ -230,16 +263,6 @@ export default function WritePage(props) {
     }
   };
 
-  const updateAccountList = () => {
-    accountList.forEach((item, index) => {
-      if (item.userID === USER.userID) {
-        accountList[index] = USER;
-        return;
-      }
-    });
-    localStorage.setItem("accountList", JSON.stringify(accountList));
-  };
-
   return (
     <section className={"writeContainer"}>
       {isLoading && (
@@ -257,10 +280,17 @@ export default function WritePage(props) {
             rows={1}
           />
           <div className={"titleBar"} />
+          <section className="tagSection">{tagElement}</section>
           <input
-            className={"tag"}
+            ref={tagTextareaRef}
+            className={"tagInput"}
             type="textarea"
             placeholder="태그를 입력하세요."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleTagChange();
+              }
+            }}
           />
           <section className={"buttons"}>
             <button className={"buttonH"}>
@@ -304,9 +334,7 @@ export default function WritePage(props) {
             className={"content"}
             placeholder="당신의 이야기를 적어보세요..."
             onInput={handleContentChange}
-          >
-            {""}
-          </div>
+          ></div>
           <input
             ref={imageSelectorRef}
             className="imageSelector hide"

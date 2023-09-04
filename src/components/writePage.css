@@ -41,8 +41,21 @@ button {
   margin: 10px 0;
 }
 
-.writeContainer .inputSection .tag {
+.writeContainer .inputSection .tagInput {
   margin-bottom: 10px;
+}
+.writeContainer .inputSection .tagSection {
+  display: flex;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.writeContainer .inputSection .tagSection .tag {
+  padding: 5px 10px;
+  background-color: var(--velog-grey);
+  border-radius: 50px;
+  margin: 5px 10px;
+  color: var(--velog-green);
 }
 
 .writeContainer .inputSection .buttons {

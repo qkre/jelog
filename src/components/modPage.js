@@ -3,30 +3,58 @@ import "./writePage.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
-  faClose,
   faImage,
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import Modal from "react-modal";
 import axios from "axios";
+import imageCompression from "browser-image-compression";
 
 export default function ModPage(props) {
-  const { USER } = props;
+  const URL = "http://118.67.132.220:8080";
 
-  const [isError, setIsError] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [article, setArticle] = useState();
+  const [isLoading, setIsLoading] = useState(false);
+  const [tagList, setTagList] = useState([]);
+  const [tagElement, setTagElement] = useState([]);
 
   const publisher = useLocation().pathname.split("/")[2];
   const articleID = parseInt(useLocation().pathname.split("/")[3]);
 
+  const tagTextareaRef = useRef();
   const titleTextareaRef = useRef();
   const contentTextareaRef = useRef();
   const previewTitleRef = useRef();
   const previewContentRef = useRef();
   const imageSelectorRef = useRef();
+
+  const deleteTag = (e) => {
+    const modifiedTagList = tagList.filter((tag) => tag !== e.target.innerText);
+    console.log(modifiedTagList);
+    setTagList(modifiedTagList);
+  };
+
+  const handleTagChange = () => {
+    const tags = tagTextareaRef.current.value.split(" ");
+    const mergedTagList = [...tagList, ...tags];
+    const uniqueTagList = [...new Set(mergedTagList)];
+    setTagList(uniqueTagList);
+    tagTextareaRef.current.value = "";
+  };
+
+  useEffect(() => {
+    const newTagElement = tagList.map((tag) => {
+      return (
+        <div className="tag" onClick={deleteTag}>
+          {tag}
+        </div>
+      );
+    });
+    setTagElement(newTagElement);
+  }, [tagList]);
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -35,7 +63,6 @@ export default function ModPage(props) {
     previewTitleRef.current.style.height =
       titleTextareaRef.current.scrollHeight + "px";
     previewTitleRef.current.value = titleTextareaRef.current.value;
-    errCheck();
   };
 
   const handleContentChange = () => {
@@ -45,7 +72,6 @@ export default function ModPage(props) {
     previewContentRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
-    errCheck();
   };
 
   const handleModPost = async () => {
@@ -59,10 +85,12 @@ export default function ModPage(props) {
         content = content.replace(img.src, imgUrl);
       }
     }
+    console.log(tagList.toString());
     axios
-      .put(`/api/articles/${publisher}/${articleID}`, {
+      .put(`${URL}/api/articles/${publisher}/${articleID}`, {
         title: title,
         content: content,
+        tags: tagList.toString(),
       })
       .then((res) => {
         console.log(res.data);
@@ -71,61 +99,81 @@ export default function ModPage(props) {
       .catch((e) => console.error(e));
   };
 
-  const errCheck = () => {
-    if (
-      previewContentRef.current.innerHTML === "" ||
-      titleTextareaRef.current.value === ""
-    ) {
-      setIsError(true);
-    } else {
-      setIsError(false);
-    }
-  };
-
   const closeModal = () => {
     setShowModal(false);
   };
 
-  const showAlertPopUp = () => {
-    const alertSaveRef = document.querySelector(".alertSave");
-    alertSaveRef.style.display = "flex";
-    setTimeout(() => {
-      alertSaveRef.style.display = "none";
-    }, 2000);
+  const resizeImage = async (image) => {
+    // 현재 커서 위치 저장
+    const sel = window.getSelection();
+    let savedRange;
+    if (sel.rangeCount > 0) {
+      savedRange = sel.getRangeAt(0);
+    }
+
+    setIsLoading(true);
+    const resizingBlob = await imageCompression(image, {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 800,
+      useWebWorker: true,
+    });
+    setIsLoading(false);
+    const resizingFile = new File([resizingBlob], image.name, {
+      type: image.type,
+    });
+
+    // 저장한 커서 위치 복원
+    if (savedRange) {
+      sel.removeAllRanges();
+      sel.addRange(savedRange);
+    }
+
+    return resizingFile;
   };
 
   const uploadImage = async () => {
     const fileInput = document.querySelector(".imageSelector");
-    const file = fileInput.files[0];
+    if (fileInput.files[0]) {
+      const file = await resizeImage(fileInput.files[0]);
+      const formData = new FormData();
+      console.log(file);
+      formData.append("file", file);
 
-    const formData = new FormData();
-    formData.append("file", file);
+      try {
+        const response = await axios.post(`${URL}/api/uploadImage`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
+        const imageURL = response.data;
+        console.log("InsertImageToEditor Start");
+        await insertImageToEditor(imageURL);
+        console.log("InsertImageToEditor End");
 
-    try {
-      const response = await axios.post("/api/uploadImage", formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-      const imageURL = response.data;
-      insertImageToEditor(imageURL);
-      console.log(response);
-      return imageURL;
-    } catch (err) {
-      console.error("Error uploadTets : ", err);
+        // handleContentChange();
+      } catch (err) {
+        console.error("Error uploadTets : ", err);
+      }
     }
   };
 
   const insertImageToEditor = async (imageURL) => {
     const imgTag = document.createElement("img");
     imgTag.src = imageURL;
-
     const sel = window.getSelection();
+    let range;
+
     // 현재 선택된 커서 위치를 가져옴.
     if (sel.rangeCount) {
-      const range = sel.getRangeAt(0);
+      range = sel.getRangeAt(0);
+    }
 
-      range.insertNode(imgTag);
+    // 커서가 contentTextareRef 내부에 있는지 확인
+    if (
+      range &&
+      contentTextareaRef.current.contains(range.commonAncestorContainer)
+    ) {
+      await range.insertNode(imgTag);
 
       // 이미지 뒤로 커서 설정
       range.setStartAfter(imgTag);
@@ -133,14 +181,28 @@ export default function ModPage(props) {
       sel.removeAllRanges();
       sel.addRange(range);
     } else {
-      // 선택된 커서 영역이 없는 경우, 그냥 마지막에 추가
-      contentTextareaRef.current.appendChild(imgTag);
+      // 커서가 밖에 있거나, 선택되지 않은 경우
+      await contentTextareaRef.current.appendChild(imgTag);
+
+      range = document.createRange();
+      range.setStartAfter(imgTag);
+      range.collapse(true);
+      sel.removeAllRanges();
+      sel.addRange(range);
     }
+
+    const imageLoadPromise = new Promise((resolve) => {
+      imgTag.onload = resolve;
+    });
+
+    await imageLoadPromise;
+    await handleContentChange();
+    contentTextareaRef.current.focus();
   };
 
   useEffect(() => {
     axios
-      .get(`/api/articles/${publisher}/${articleID}`)
+      .get(`${URL}/api/articles/${publisher}/${articleID}`)
       .then((res) => setArticle(res.data))
       .catch((e) => console.error("Error Occured on load ModPage :: " + e));
   }, []);
@@ -152,9 +214,8 @@ export default function ModPage(props) {
         .parseFromString(article.content, "text/html")
         .querySelector("div");
 
-      console.log(contentElement);
-
       contentTextareaRef.current.innerHTML = contentElement.innerHTML;
+      setTagList(article.tags.split(","));
       handleTitleChange();
       handleContentChange();
     }
@@ -162,6 +223,11 @@ export default function ModPage(props) {
 
   return (
     <section className={"writeContainer"}>
+      {isLoading && (
+        <div className="loadingSpinner">
+          <span className="loadingText">Uploading..</span>
+        </div>
+      )}
       <Modal isOpen={showModal} className="loadSaveModalContainer">
         <span className="title">임시 포스트 불러오기</span>
         <span className="content">임시저장된 포스트를 불러오시겠습니까?</span>
@@ -182,10 +248,17 @@ export default function ModPage(props) {
             rows={1}
           />
           <div className={"titleBar"} />
+          <section className="tagSection">{tagElement}</section>
           <input
-            className={"tag"}
+            ref={tagTextareaRef}
+            className={"tagInput"}
             type="textarea"
             placeholder="태그를 입력하세요."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleTagChange();
+              }
+            }}
           />
           <section className={"buttons"}>
             <button className={"buttonH"}>

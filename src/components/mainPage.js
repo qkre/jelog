@@ -4,7 +4,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowTrendUp,
   faClock,
-  faClose,
   faArrowDown,
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
@@ -14,67 +13,75 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function MainPage(props) {
+  const { isChanged } = props;
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
   useEffect(() => {
     axios
-      .get("/api/articles")
-      .then((res) => setArticles(res.data))
+      .get("http://118.67.132.220:8080/api/articles")
+      .then((res) => {
+        setArticles(res.data);
+        console.log(res);
+      })
       .catch((err) => console.log(err));
   }, []);
   useEffect(() => {
-    if (articles !== undefined) {
-      const articleList = articles.map((article) => {
-        const contentElement = new DOMParser()
-          .parseFromString(article.content, "text/html")
-          .querySelector("div");
-        let thumbnailJSX;
+    try {
+      if (articles !== undefined) {
+        const articleList = articles.map((article) => {
+          const contentElement = new DOMParser()
+            .parseFromString(article.content, "text/html")
+            .querySelector("div");
+          let thumbnailJSX;
 
-        try {
-          const thumbnail = contentElement.querySelector("img");
+          try {
+            const thumbnail = contentElement.querySelector("img");
 
-          thumbnailJSX = React.createElement("div", {
-            dangerouslySetInnerHTML: {
-              __html: thumbnail.outerHTML,
-            },
-          });
-        } catch (err) {
-          thumbnailJSX = React.createElement("div");
-        }
+            thumbnailJSX = React.createElement("div", {
+              dangerouslySetInnerHTML: {
+                __html: thumbnail.outerHTML,
+              },
+            });
+          } catch (err) {
+            thumbnailJSX = React.createElement("div");
+          }
 
-        const firstText = Array.from(contentElement.childNodes).find(
-          (item) => item.nodeName === "#text"
-        ).textContent;
+          const firstText = Array.from(contentElement.childNodes).find(
+            (item) => item.nodeName === "#text"
+          ).textContent;
 
-        const createAt = (date) => {
-          const createdAt = moment(date);
-          return <span className="createdAt">{createdAt.fromNow()}</span>;
-        };
+          const createAt = (date) => {
+            const createdAt = moment(date);
+            return <span className="createdAt">{createdAt.fromNow()}</span>;
+          };
 
-        return (
-          <Link
-            to={`/articles/${article.publisher}/${article.id}`}
-            className="articleBox"
-          >
-            <div className="innerBox">
-              <div className="thumbnail">{thumbnailJSX}</div>
-              <span className="title">{article.title}</span>
-              <span className="content">{firstText}</span>
-            </div>
-            <span className="date">{createAt(article.createAt)}</span>
-            <section className="infoSection">
-              <div>
-                <div className="userIcon" />
-                <span className="userID">by {article.publisher}</span>
+          return (
+            <Link
+              to={`/articles/${article.publisher}/${article.id}`}
+              className="articleBox"
+            >
+              <div className="innerBox">
+                <div className="thumbnail">{thumbnailJSX}</div>
+                <span className="title">{article.title}</span>
+                <span className="content">{firstText}</span>
               </div>
-            </section>
-          </Link>
-        );
-      });
-      setArticleElement(articleList);
+              <span className="date">{createAt(article.createAt)}</span>
+              <section className="infoSection">
+                <div>
+                  <div className="userIcon" />
+                  <span className="userID">by {article.publisher}</span>
+                </div>
+              </section>
+            </Link>
+          );
+        });
+        setArticleElement(articleList);
+      }
+    } catch (e) {
+      console.error(e);
     }
-  }, [articles]);
+  }, [articles, isChanged]);
   return (
     <div>
       <section className={"bodyContainer"}>

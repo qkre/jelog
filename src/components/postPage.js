@@ -13,6 +13,8 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function PostPage(props) {
+  const URL = "http://118.67.132.220:8080";
+
   const { USER, setIsDeleteModalOpen, setDeletePostInfo } = props;
   const [articleInfo, setArticleInfo] = useState();
   const [articleElement, setArticleElement] = useState();
@@ -32,7 +34,7 @@ export default function PostPage(props) {
 
   useEffect(() => {
     axios
-      .get(`/api/articles/${publisher}/${articleID}`)
+      .get(`${URL}/api/articles/${publisher}/${articleID}`)
       .then((res) => setArticleInfo(res.data))
       .catch((err) => console.log(err));
     setDeletePostInfo({
@@ -52,6 +54,10 @@ export default function PostPage(props) {
       const contentElement = new DOMParser()
         .parseFromString(articleInfo.content, "text/html")
         .querySelector("div");
+
+      const tagElement = articleInfo.tags.split(",").map((tag) => {
+        return <div className="tag">{tag}</div>;
+      });
 
       const article = (
         <div>
@@ -95,12 +101,7 @@ export default function PostPage(props) {
                     </span>
                   </div>
                 </section>
-                <section className={"tagSection"}>
-                  <span className={"tag"}>Tag1</span>
-                  <span className={"tag"}>Tag2</span>
-                  <span className={"tag"}>Tag3</span>
-                  <span className={"tag"}>Tag4</span>
-                </section>
+                <section className={"tagSection"}>{tagElement}</section>
               </section>
               <section className={"seriesSection"}>
                 <span className={"seriesTitle"}>Series Title</span>

@@ -1,13 +1,6 @@
 import "./App.css";
-import React, { useEffect, useReducer, useState } from "react";
-import {
-  BrowserRouter,
-  Link,
-  Route,
-  Routes,
-  json,
-  useLocation,
-} from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
 import WritePage from "./components/writePage";
 import MainPage from "./components/mainPage";
 import RecentPage from "./components/recentPage";
@@ -15,7 +8,7 @@ import PostPage from "./components/postPage";
 import ModPage from "./components/modPage";
 import Header from "./components/header";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faClose, faHeart } from "@fortawesome/free-solid-svg-icons";
+import { faClose } from "@fortawesome/free-solid-svg-icons";
 import SavePage from "./components/savePage";
 import SaveWritePage from "./components/saveWirtePage";
 import Modal from "react-modal";
@@ -27,6 +20,7 @@ function App() {
   const [accountList, setAccountList] = useState([]);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deletePostInfo, setDeletePostInfo] = useState();
+  const [isChanged, setIsChanged] = useState();
 
   useEffect(() => {
     try {
@@ -103,7 +97,7 @@ function App() {
         setAccountList={setAccountList}
       />
       <Routes>
-        <Route index="index" element={<MainPage />} />
+        <Route index="index" element={<MainPage isChanged={isChanged} />} />
         <Route path="/recent" element={<RecentPage />} />
         <Route
           path="/articles/:userID/:id"
@@ -145,6 +139,7 @@ function App() {
               accountList={accountList}
               postList={postList}
               setPostList={setPostList}
+              setIsChanged={setIsChanged}
             />
           }
         />

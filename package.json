@@ -2,6 +2,7 @@
   "name": "jelog",
   "version": "0.1.0",
   "private": true,
+  "homepage": "/.",
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^6.4.0",
     "@fortawesome/free-brands-svg-icons": "^6.4.0",
@@ -47,5 +48,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "http://118.67.132.220:8080"
 }
