@@ -97,7 +97,7 @@ function App() {
         setAccountList={setAccountList}
       />
       <Routes>
-        <Route index="index" element={<MainPage isChanged={isChanged} />} />
+        <Route index="/" element={<MainPage isChanged={isChanged} />} />
         <Route path="/recent" element={<RecentPage />} />
         <Route
           path="/articles/:userID/:id"
