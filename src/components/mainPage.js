@@ -47,10 +47,16 @@ export default function MainPage(props) {
             thumbnailJSX = React.createElement("div");
           }
 
-          const firstText = Array.from(contentElement.childNodes).find(
-            (item) => item.nodeName === "#text"
-          ).textContent;
-
+          let firstText;
+          try {
+            console.log(contentElement.childNodes);
+            firstText = Array.from(contentElement.childNodes).find(
+              (item) => item.nodeName === "#text"
+            ).textContent;
+          } catch (err) {
+            console.log(err);
+            firstText = "내용이 없습니다.";
+          }
           const createAt = (date) => {
             const createdAt = moment(date);
             return <span className="createdAt">{createdAt.fromNow()}</span>;

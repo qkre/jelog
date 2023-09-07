@@ -11,6 +11,7 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
+import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
 export default function WritePage(props) {
   const URL = "http://118.67.132.220:8080";
@@ -78,8 +79,22 @@ export default function WritePage(props) {
     contentTextareaRef.current.scrollTop =
       contentTextareaRef.current.scrollHeight;
 
-    console.log("handleContentChange Applied");
+    ensureDivWrap();
     errCheck();
+  };
+
+  const ensureDivWrap = () => {
+    let contentElement = contentTextareaRef.current;
+
+    for (let i = 0; i < contentElement.childNodes.length; i++) {
+      let node = contentElement.childNodes[i];
+
+      if (node.nodeType === 3 && /\S/.test(node.nodeValue)) {
+        let div = document.createElement("div");
+        div.textContent = node.nodeValue;
+        contentElement.replaceChild(div, node);
+      }
+    }
   };
 
   const resizeImage = async (image) => {
@@ -153,7 +168,7 @@ export default function WritePage(props) {
       range &&
       contentTextareaRef.current.contains(range.commonAncestorContainer)
     ) {
-      await range.insertNode(imgTag);
+      range.insertNode(imgTag);
 
       // 이미지 뒤로 커서 설정
       range.setStartAfter(imgTag);
@@ -162,7 +177,7 @@ export default function WritePage(props) {
       sel.addRange(range);
     } else {
       // 커서가 밖에 있거나, 선택되지 않은 경우
-      await contentTextareaRef.current.appendChild(imgTag);
+      contentTextareaRef.current.appendChild(imgTag);
 
       range = document.createRange();
       range.setStartAfter(imgTag);
@@ -177,8 +192,26 @@ export default function WritePage(props) {
 
     await imageLoadPromise;
     await handleContentChange();
+    enterKeyPress(contentTextareaRef.current);
     contentTextareaRef.current.focus();
   };
+
+  function enterKeyPress(contentEditableElement) {
+    console.log("enterKeyPress");
+    const sel = window.getSelection(); // 현재 선택 영역 가져오기
+    const range = sel.getRangeAt(0); // 선택 영역의 범위 가져오기
+    const div = document.createElement("div"); // 새로운 div 생성
+    range.insertNode(div); // 현재 커서 위치에 div 삽입
+
+    // 새로운 범위 생성
+    const newRange = document.createRange();
+    newRange.setStartAfter(div); // 새 범위 시작점을 div 다음으로 설정
+    newRange.collapse(true); // 범위 접기
+
+    // 새 범위를 활성 선택 영역으로 설정
+    sel.removeAllRanges();
+    sel.addRange(newRange);
+  }
 
   const handleAddPost = async () => {
     if (!isError) {

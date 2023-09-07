@@ -103,8 +103,8 @@
 }
 
 .loginModal .mainContainer {
-  width: 500px;
-  height: 450px;
+  width: 50vw;
+  height: 40vh;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
@@ -131,6 +131,12 @@
 .imageSection .welcomeMessage {
   font-size: 26px;
   font-weight: 600;
+}
+
+@media (max-width: 400px) {
+  .imageSection {
+    display: none;
+  }
 }
 
 .loginModal .loginSection {
