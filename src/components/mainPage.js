@@ -49,10 +49,13 @@ export default function MainPage(props) {
 
           let firstText;
           try {
-            console.log(contentElement.childNodes);
-            firstText = Array.from(contentElement.childNodes).find(
-              (item) => item.nodeName === "#text"
-            ).textContent;
+            const childNodes = Array.from(contentElement.childNodes);
+            const firstDIV = childNodes.find((item) => {
+              if (item.tagName === "DIV" && item.innerText !== "") {
+                return item;
+              }
+            });
+            firstText = firstDIV.innerText;
           } catch (err) {
             console.log(err);
             firstText = "내용이 없습니다.";
