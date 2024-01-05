@@ -12,7 +12,7 @@ import Modal from "react-modal";
 import axios from "axios";
 
 export default function Header(props) {
-  const URL = "http://118.67.132.220:8080";
+  const serverLocation = "http://localhost:8080";
   const { setUSER, isLogin, setIsLogin, accountList } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
@@ -53,13 +53,13 @@ export default function Header(props) {
   const onClickLoginButton = () => {
     if (modalState === "login") {
       axios
-        .post(`${URL}/api/login`, {
+        .post(`${serverLocation}/api/login`, {
           email: userID,
           password: userPW,
         })
         .then((res) => {
           axios
-            .get(`${URL}/api/login/${userID}`)
+            .get(`${serverLocation}/api/login/${userID}`)
             .then((res) => {
               console.log(res.data);
               const user = res.data;
@@ -81,7 +81,7 @@ export default function Header(props) {
         const userIcon =
           "#" + Math.floor(Math.random() * 0xffffff).toString(16);
         axios
-          .post(`${URL}/api/register`, {
+          .post(`${serverLocation}/api/register`, {
             userID: userID.split("@")[0],
             password: userPW,
             email: userID,

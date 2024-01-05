@@ -13,13 +13,14 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function MainPage(props) {
+  const serverLocation = "http://localhost:8080";
   const { isChanged } = props;
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
   useEffect(() => {
     axios
-      .get("http://118.67.132.220:8080/api/articles")
+      .get(`${serverLocation}/api/articles`)
       .then((res) => {
         setArticles(res.data);
         console.log(res);

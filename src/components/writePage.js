@@ -11,10 +11,9 @@ import {
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
-import { keyboard } from "@testing-library/user-event/dist/keyboard";
 
 export default function WritePage(props) {
-  const URL = "http://118.67.132.220:8080";
+  const serverLocation = "http://localhost:8080";
 
   const { USER, accountList } = props;
   const [tagList, setTagList] = useState([]);
@@ -135,11 +134,15 @@ export default function WritePage(props) {
       formData.append("file", file);
 
       try {
-        const response = await axios.post(`${URL}/api/uploadImage`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await axios.post(
+          `${serverLocation}/api/uploadImage`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         const imageURL = response.data;
         console.log("InsertImageToEditor Start");
         await insertImageToEditor(imageURL);
@@ -231,7 +234,7 @@ export default function WritePage(props) {
       console.log(tagList);
 
       axios
-        .post(`${URL}/api/publish`, {
+        .post(`${serverLocation}/api/publish`, {
           title: title,
           content: content,
           publisher: publisher,

@@ -13,7 +13,7 @@ import axios from "axios";
 import imageCompression from "browser-image-compression";
 
 export default function ModPage(props) {
-  const URL = "http://118.67.132.220:8080";
+  const serverLocation = "http://localhost:8080";
 
   const [showModal, setShowModal] = useState(false);
   const [article, setArticle] = useState();
@@ -87,7 +87,7 @@ export default function ModPage(props) {
     }
     console.log(tagList.toString());
     axios
-      .put(`${URL}/api/articles/${publisher}/${articleID}`, {
+      .put(`${serverLocation}/api/articles/${publisher}/${articleID}`, {
         title: title,
         content: content,
         tags: tagList.toString(),
@@ -140,11 +140,15 @@ export default function ModPage(props) {
       formData.append("file", file);
 
       try {
-        const response = await axios.post(`${URL}/api/uploadImage`, formData, {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        });
+        const response = await axios.post(
+          `${serverLocation}/api/uploadImage`,
+          formData,
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
+        );
         const imageURL = response.data;
         console.log("InsertImageToEditor Start");
         await insertImageToEditor(imageURL);
@@ -202,7 +206,7 @@ export default function ModPage(props) {
 
   useEffect(() => {
     axios
-      .get(`${URL}/api/articles/${publisher}/${articleID}`)
+      .get(`${serverLocation}/api/articles/${publisher}/${articleID}`)
       .then((res) => setArticle(res.data))
       .catch((e) => console.error("Error Occured on load ModPage :: " + e));
   }, []);

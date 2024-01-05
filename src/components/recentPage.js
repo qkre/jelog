@@ -13,14 +13,14 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function RecentPage() {
-  const URL = "http://118.67.132.220:8080";
+  const serverLocation = "http://localhost:8080";
 
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
   useEffect(() => {
     axios
-      .get(`${URL}/api/articles`)
+      .get(`${serverLocation}/api/articles`)
       .then((res) => {
         const sortedArticles = res.data;
         sortedArticles.sort((a, b) => {

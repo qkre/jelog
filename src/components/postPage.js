@@ -13,7 +13,7 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function PostPage(props) {
-  const URL = "http://118.67.132.220:8080";
+  const serverLocation = "http://localhost:8080";
 
   const { USER, setIsDeleteModalOpen, setDeletePostInfo } = props;
   const [articleInfo, setArticleInfo] = useState();
@@ -34,7 +34,7 @@ export default function PostPage(props) {
 
   useEffect(() => {
     axios
-      .get(`${URL}/api/articles/${publisher}/${articleID}`)
+      .get(`${serverLocation}/api/articles/${publisher}/${articleID}`)
       .then((res) => setArticleInfo(res.data))
       .catch((err) => console.log(err));
     setDeletePostInfo({
