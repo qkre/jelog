@@ -18,15 +18,15 @@ export default function MainPage(props) {
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
-  useEffect(() => {
-    axios
-      .get(`${serverLocation}/api/articles`)
-      .then((res) => {
-        setArticles(res.data);
-        console.log(res);
-      })
-      .catch((err) => console.log(err));
-  }, []);
+  // useEffect(() => {
+  //   axios
+  //     .get(`${serverLocation}/api/articles`)
+  //     .then((res) => {
+  //       setArticles(res.data);
+  //       console.log(res);
+  //     })
+  //     .catch((err) => console.log(err));
+  // }, []);
   useEffect(() => {
     try {
       if (articles !== undefined) {

@@ -13,9 +13,7 @@ import axios from "axios";
 import imageCompression from "browser-image-compression";
 
 export default function WritePage(props) {
-  const serverLocation = "http://localhost:8080";
-
-  const { USER, accountList } = props;
+  const [userEmail, setUserEmail] = useState();
   const [tagList, setTagList] = useState([]);
   const [tagElement, setTagElement] = useState([]);
 
@@ -45,6 +43,10 @@ export default function WritePage(props) {
     setTagList(uniqueTagList);
     tagTextareaRef.current.value = "";
   };
+
+  useEffect(() => {
+    setUserEmail(localStorage.getItem("userEmail"));
+  }, []);
 
   useEffect(() => {
     const newTagElement = tagList.map((tag) => {
@@ -134,15 +136,11 @@ export default function WritePage(props) {
       formData.append("file", file);
 
       try {
-        const response = await axios.post(
-          `${serverLocation}/api/uploadImage`,
-          formData,
-          {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          }
-        );
+        const response = await axios.post(`api/uploadImage`, formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        });
         const imageURL = response.data;
         console.log("InsertImageToEditor Start");
         await insertImageToEditor(imageURL);
@@ -229,12 +227,12 @@ export default function WritePage(props) {
         }
       }
 
-      const publisher = USER.userID;
+      const publisher = localStorage.getItem("userEmail");
 
       console.log(tagList);
 
       axios
-        .post(`${serverLocation}/api/publish`, {
+        .post(`api/publish`, {
           title: title,
           content: content,
           publisher: publisher,
@@ -255,8 +253,8 @@ export default function WritePage(props) {
       const title = titleTextareaRef.current.value;
       const content = previewContentRef.current.outerHTML;
       const savePost = {
-        userID: USER.userID,
-        id: USER.saveIndex,
+        userEmail: userEmail,
+        id: 1,
         title: title,
         content: content,
         date: today.toLocaleDateString(),
@@ -264,16 +262,16 @@ export default function WritePage(props) {
         isSavedPost: true,
       };
 
-      if (USER.saveIndex > 0) {
-        const modifiedList = [...USER.savedPost];
-        modifiedList[USER.saveIndex] = savePost;
-        USER.savedPost = modifiedList;
-      } else {
-        USER.savedPost.push(savePost);
-      }
-      USER.saveIndex += 1;
-      localStorage.setItem("accountList", JSON.stringify(accountList));
-      localStorage.setItem("USER", JSON.stringify(USER));
+      // if (USER.saveIndex > 0) {
+      //   const modifiedList = [...USER.savedPost];
+      //   modifiedList[USER.saveIndex] = savePost;
+      //   USER.savedPost = modifiedList;
+      // } else {
+      //   USER.savedPost.push(savePost);
+      // }
+      // USER.saveIndex += 1;
+      // localStorage.setItem("accountList", JSON.stringify(accountList));
+      // localStorage.setItem("USER", JSON.stringify(USER));
       showAlertPopUp();
     }
   };

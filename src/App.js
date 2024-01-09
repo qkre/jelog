@@ -13,7 +13,9 @@ import SavePage from "./components/savePage";
 import SaveWritePage from "./components/saveWirtePage";
 import Modal from "react-modal";
 import axios from "axios";
+import PrivateRoute from "./lib/privateRoute";
 function App() {
+  const [access, setAccess] = useState(false);
   const [postList, setPostList] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
   const [USER, setUSER] = useState();
@@ -23,12 +25,48 @@ function App() {
   const [isChanged, setIsChanged] = useState();
 
   useEffect(() => {
-    try {
-      console.log("Current USER ::: " + USER.email);
-    } catch {
-      console.log("Not Logined");
+    const token = localStorage.getItem("token");
+
+    if (token) {
+      axios
+        .get("api/jwt/valid", {
+          params: {
+            token: token,
+          },
+        })
+        .then((res) => {
+          console.log("Token is expired? " + res.data);
+          if (!res.data) {
+            const userEmail = localStorage.getItem("userEmail");
+            setAccess(true);
+            axios
+              .get(`api/user/detail`, {
+                params: {
+                  userEmail: userEmail,
+                },
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              })
+              .then((res) => {
+                console.log(res.data);
+              })
+              .catch((err) => console.log(err));
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
-  }, USER);
+  }, []);
+
+  // useEffect(() => {
+  //   try {
+  //     console.log("Current USER ::: " + USER.email);
+  //   } catch {
+  //     console.log("Not Logined");
+  //   }
+  // }, USER);
 
   const deleteModalFunctions = {
     closeModal: () => {
@@ -89,13 +127,7 @@ function App() {
         </section>
         <div className="alertTimer" />
       </div>
-      <Header
-        setUSER={setUSER}
-        isLogin={isLogin}
-        setIsLogin={setIsLogin}
-        accountList={accountList}
-        setAccountList={setAccountList}
-      />
+      <Header isLogin={isLogin} setIsLogin={setIsLogin} />
       <Routes>
         <Route index="/" element={<MainPage isChanged={isChanged} />} />
         <Route path="/recent" element={<RecentPage />} />
@@ -112,38 +144,61 @@ function App() {
         <Route
           path="/write"
           element={
-            <WritePage
-              USER={USER}
-              accountList={accountList}
-              postList={postList}
-              setPostList={setPostList}
+            <PrivateRoute
+              authenticated={access}
+              component={
+                <WritePage
+                  USER={USER}
+                  accountList={accountList}
+                  postList={postList}
+                  setPostList={setPostList}
+                />
+              }
             />
           }
         />
         <Route
           path="/write/saved/:id"
           element={
-            <SaveWritePage
-              USER={USER}
-              accountList={accountList}
-              postList={postList}
-              setPostList={setPostList}
+            <PrivateRoute
+              authenticated={access}
+              component={
+                <SaveWritePage
+                  USER={USER}
+                  accountList={accountList}
+                  postList={postList}
+                  setPostList={setPostList}
+                />
+              }
             />
           }
         />
         <Route
           path="/write/:userID/:id"
           element={
-            <ModPage
-              USER={USER}
-              accountList={accountList}
-              postList={postList}
-              setPostList={setPostList}
-              setIsChanged={setIsChanged}
+            <PrivateRoute
+              authenticated={access}
+              component={
+                <ModPage
+                  USER={USER}
+                  accountList={accountList}
+                  postList={postList}
+                  setPostList={setPostList}
+                  setIsChanged={setIsChanged}
+                />
+              }
             />
           }
         />
-        <Route path="/saves" element={<SavePage USER={USER} />} />
+        <Route
+          path="/saves"
+          element={
+            <PrivateRoute
+              authenticated={access}
+              component={<SavePage USER={USER} />}
+            />
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

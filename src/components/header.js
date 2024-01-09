@@ -12,13 +12,11 @@ import Modal from "react-modal";
 import axios from "axios";
 
 export default function Header(props) {
-  const serverLocation = "http://localhost:8080";
-  const { setUSER, isLogin, setIsLogin, accountList } = props;
+  const { isLogin, setIsLogin } = props;
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
-  const [userID, setUserID] = useState();
-  const [userPW, setUserPW] = useState();
-  const [account, setAccount] = useState();
+  const [userEmail, setUserEmail] = useState();
+  const [userPw, setUserPw] = useState();
   const writeButtonRef = useRef();
   const userIconButtonRef = useRef();
   const userMenuButtonRef = useRef();
@@ -36,10 +34,34 @@ export default function Header(props) {
     message: useRef(),
     messageButton: useRef(),
     registerSuccessMessage: useRef(),
-    userIDInputRef: useRef(),
-    userPWInputRef: useRef(),
+    userEmailInputRef: useRef(),
+    userPwInputRef: useRef(),
     alertPopUP: useRef(),
   };
+
+  useEffect(() => {
+    const userEmail = localStorage.getItem("userEmail");
+    const token = localStorage.getItem("token");
+
+    axios
+      .get(`/api/user/detail`, {
+        params: {
+          userEmail: userEmail,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => {
+        console.log(res);
+        setUserEmail(localStorage.getItem("userEmail"));
+        setIsLogin(true);
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLogin(false);
+      });
+  }, []);
 
   const showLoginModal = () => {
     setShowModal(true);
@@ -50,68 +72,85 @@ export default function Header(props) {
     setIsLogin(false);
   };
 
-  const onClickLoginButton = () => {
+  const onClickLoginButton = async () => {
     if (modalState === "login") {
       axios
-        .post(`${serverLocation}/api/login`, {
-          email: userID,
-          password: userPW,
+        .post(`/api/user/login`, {
+          userEmail: userEmail,
+          userPw: userPw,
         })
-        .then((res) => {
-          axios
-            .get(`${serverLocation}/api/login/${userID}`)
-            .then((res) => {
-              console.log(res.data);
-              const user = res.data;
-              setUSER(user);
-              setAccount(user);
-              setIsLogin(true);
-              userIconButtonRef.current.style.backgroundColor = "";
-              setShowModal(false);
-              navigate("/");
-            })
-            .catch((err) => console.log(err));
+        .then(async (res) => {
+          console.log(res.data);
+          const message = res.data.message;
+          const token = res.data.token;
+
+          await localStorage.setItem("userEmail", userEmail);
+          await localStorage.setItem("token", token);
+
+          setIsLogin(true);
+          userIconButtonRef.current.style.backgroundColor = "";
+          setShowModal(false);
+          navigate("/");
         })
         .catch((err) => {
           console.log(err);
           showAlertPopUp();
         });
     } else {
-      if (isEmailVaild()) {
+      if (await isEmailVaild()) {
+        console.log("회원가입 버튼 클릭");
         const userIcon =
           "#" + Math.floor(Math.random() * 0xffffff).toString(16);
         axios
-          .post(`${serverLocation}/api/register`, {
-            userID: userID.split("@")[0],
-            password: userPW,
-            email: userID,
-            icon: userIcon,
+          .post(`/api/user/register`, {
+            userEmail: userEmail,
+            userPw: userPw,
+            userIcon: userIcon,
           })
           .then((res) => {
             console.log(res);
-            modalTags.userIDInputRef.current.style.backgroundColor =
+            modalTags.userEmailInputRef.current.style.backgroundColor =
               "var(--velog-white-green)";
-            modalTags.userIDInputRef.current.style.color = "var(--velog-green)";
-            modalTags.userIDInputRef.current.style.fontWeight = "600";
+            modalTags.userEmailInputRef.current.style.color =
+              "var(--velog-green)";
+            modalTags.userEmailInputRef.current.style.fontWeight = "600";
 
-            modalTags.userIDInputRef.current.value =
+            modalTags.userEmailInputRef.current.value =
               "✔️ 회원가입 링크가 이메일로 전송되었습니다.";
-            modalTags.userIDInputRef.current.readOnly = "true";
-            modalTags.userPWInputRef.current.style.display = "none";
+            modalTags.userEmailInputRef.current.readOnly = "true";
+            modalTags.userPwInputRef.current.style.display = "none";
             modalTags.mainButton.current.style.display = "none";
           })
           .catch((err) => {
             console.log(err);
             showAlertPopUp();
           });
+      } else {
+        showAlertPopUp();
       }
     }
   };
 
-  const isEmailVaild = () => {
+  const isEmailVaild = async () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^s@]+$/;
-    if (accountList.some((item) => item.account === userID)) return false;
-    return emailPattern.test(userID);
+    var isUnique = true;
+    await axios
+      .get(`/api/user/valid`, {
+        params: {
+          userEmail: userEmail,
+        },
+      })
+      .then((res) => {
+        isUnique = false;
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+
+    if (isUnique) {
+      return emailPattern.test(userEmail);
+    }
+    return false;
   };
 
   const showAlertPopUp = () => {
@@ -125,17 +164,17 @@ export default function Header(props) {
   const onClickLogoutButton = () => {
     moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
-    setUSER(undefined);
-    localStorage.removeItem("USER");
+    localStorage.removeItem("userEmail");
+    localStorage.removeItem("token");
     console.log("logoutButton Clicked");
   };
 
-  const handleUserIDChange = () => {
-    setUserID(modalTags.userIDInputRef.current.value);
+  const handleUserEmailChange = () => {
+    setUserEmail(modalTags.userEmailInputRef.current.value);
   };
 
   const handleUserPWChange = () => {
-    setUserPW(modalTags.userPWInputRef.current.value);
+    setUserPw(modalTags.userPwInputRef.current.value);
   };
 
   const onClickMoreInfoButton = () => {
@@ -165,14 +204,14 @@ export default function Header(props) {
       modalTags.message.current.innerText = "아직 회원이 아니신가요?";
       modalTags.messageButton.current.innerText = "회원가입";
 
-      modalTags.userIDInputRef.current.style.backgroundColor = "white";
-      modalTags.userIDInputRef.current.style.color = "black";
-      modalTags.userIDInputRef.current.style.fontWeight = "400";
+      modalTags.userEmailInputRef.current.style.backgroundColor = "white";
+      modalTags.userEmailInputRef.current.style.color = "black";
+      modalTags.userEmailInputRef.current.style.fontWeight = "400";
 
-      modalTags.userIDInputRef.current.value = "";
-      modalTags.userIDInputRef.current.removeAttribute("readOnly");
-      modalTags.userPWInputRef.current.value = "";
-      modalTags.userPWInputRef.current.style.display = "";
+      modalTags.userEmailInputRef.current.value = "";
+      modalTags.userEmailInputRef.current.removeAttribute("readOnly");
+      modalTags.userPwInputRef.current.value = "";
+      modalTags.userPwInputRef.current.style.display = "";
       modalTags.mainButton.current.style.display = "";
     }
 
@@ -181,10 +220,18 @@ export default function Header(props) {
 
   useEffect(() => {
     console.log("현재 로그인 상태 : " + isLogin);
-    writeButtonRef.current.classList.toggle("hide");
-    userIconButtonRef.current.classList.toggle("hide");
-    userMenuButtonRef.current.classList.toggle("hide");
-    loginButtonRef.current.classList.toggle("hide");
+    if (!isLogin) {
+      console.log(isLogin);
+      writeButtonRef.current.classList.add("hide");
+      userIconButtonRef.current.classList.add("hide");
+      userMenuButtonRef.current.classList.add("hide");
+      loginButtonRef.current.classList.remove("hide");
+    } else {
+      writeButtonRef.current.classList.remove("hide");
+      userIconButtonRef.current.classList.remove("hide");
+      userMenuButtonRef.current.classList.remove("hide");
+      loginButtonRef.current.classList.add("hide");
+    }
   }, [isLogin]);
 
   return (
@@ -218,15 +265,15 @@ export default function Header(props) {
             {/* 로그인 인증 방법 아직 개발 안됨. 현재는 이메일 비밀번호로 로그인 */}
             <section className="loginInputSectionTemp">
               <input
-                ref={modalTags.userIDInputRef}
-                className="userID"
+                ref={modalTags.userEmailInputRef}
+                className="userEmail"
                 type="email"
                 placeholder="이메일을 입력하세요."
-                onChange={handleUserIDChange}
+                onChange={handleUserEmailChange}
               />
               <input
-                ref={modalTags.userPWInputRef}
-                className="userPW"
+                ref={modalTags.userPwInputRef}
+                className="userPw"
                 type="password"
                 placeholder="비밀번호를 입력하세요."
                 onChange={handleUserPWChange}
@@ -248,11 +295,11 @@ export default function Header(props) {
 
             {/* <setcion className="loginInputSection">
               <input
-                ref={modalTags.userIDInputRef}
-                className="userID"
+                ref={modalTags.userEmailInputRef}
+                className="userEmail"
                 type="email"
                 placeholder="이메일을 입력하세요."
-                onChange={handleUserIDChange}
+                onChange={handleUserEmailChange}
               />
               <span
                 ref={modalTags.mainButton}
@@ -291,7 +338,7 @@ export default function Header(props) {
         <div className="logos">
           <Link className="logoImage">J</Link>
           <Link to={"/"} className={"logoString"}>
-            {!isLogin ? "jelog" : account.userID + ".log"}
+            {!isLogin ? "jelog" : userEmail + ".log"}
           </Link>
         </div>
         <div className={"buttons"}>

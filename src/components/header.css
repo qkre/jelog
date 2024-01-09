@@ -172,7 +172,7 @@
   margin-bottom: 20px;
 }
 
-.loginModal .loginSection .loginInputSection .userID {
+.loginModal .loginSection .loginInputSection .userEmail {
   flex: 7;
   border: 1px solid var(--velog-grey);
   padding: 10px 15px;
@@ -255,7 +255,7 @@
   height: 150px;
 }
 
-.loginModal .loginInputSectionTemp .userID {
+.loginModal .loginInputSectionTemp .userEmail {
   width: 100%;
   flex: 3;
   border: 1px solid var(--velog-grey);
@@ -263,7 +263,7 @@
   outline: none;
 }
 
-.loginModal .loginInputSectionTemp .userPW {
+.loginModal .loginInputSectionTemp .userPw {
   width: 100%;
   flex: 3;
   border: 1px solid var(--velog-grey);
