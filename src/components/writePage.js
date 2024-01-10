@@ -13,6 +13,7 @@ import axios from "axios";
 import imageCompression from "browser-image-compression";
 
 export default function WritePage(props) {
+  const { userInfo } = props;
   const [userEmail, setUserEmail] = useState();
   const [tagList, setTagList] = useState([]);
   const [tagElement, setTagElement] = useState([]);
@@ -45,7 +46,7 @@ export default function WritePage(props) {
   };
 
   useEffect(() => {
-    setUserEmail(localStorage.getItem("userEmail"));
+    document.querySelector(".headerContainer").classList.add("hide");
   }, []);
 
   useEffect(() => {
@@ -232,12 +233,20 @@ export default function WritePage(props) {
       console.log(tagList);
 
       axios
-        .post(`api/publish`, {
-          title: title,
-          content: content,
-          publisher: publisher,
-          tags: tagList.toString(),
-        })
+        .post(
+          `api/post/write`,
+          {
+            userEmail: userInfo.userEmail,
+            title: title,
+            content: content,
+            tags: tagList.toString(),
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+            },
+          }
+        )
         .then((res) => {
           console.log(res);
           document.querySelector(".headerContainer").classList.remove("hide");

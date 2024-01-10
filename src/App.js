@@ -16,6 +16,9 @@ import axios from "axios";
 import PrivateRoute from "./lib/privateRoute";
 function App() {
   const [access, setAccess] = useState(false);
+
+  const [userInfo, setUserInfo] = useState();
+
   const [postList, setPostList] = useState([]);
   const [isLogin, setIsLogin] = useState(false);
   const [USER, setUSER] = useState();
@@ -24,41 +27,58 @@ function App() {
   const [deletePostInfo, setDeletePostInfo] = useState();
   const [isChanged, setIsChanged] = useState();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
+  // useEffect(() => {
+  //   var token = "";
 
-    if (token) {
-      axios
-        .get("api/jwt/valid", {
-          params: {
-            token: token,
-          },
-        })
-        .then((res) => {
-          console.log("Token is expired? " + res.data);
-          if (!res.data) {
-            const userEmail = localStorage.getItem("userEmail");
-            setAccess(true);
-            axios
-              .get(`api/user/detail`, {
-                params: {
-                  userEmail: userEmail,
-                },
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                },
-              })
-              .then((res) => {
-                console.log(res.data);
-              })
-              .catch((err) => console.log(err));
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, []);
+  //   if (sessionStorage.getItem("token")) {
+  //     token = sessionStorage.getItem("token");
+  //   } else {
+  //     token = localStorage.getItem("token");
+  //   }
+  //   if (token != null) {
+  //     axios
+  //       .get("api/jwt/valid", {
+  //         params: {
+  //           token: token,
+  //         },
+  //       })
+  //       .then((res) => {
+  //         console.log("Token is expired? " + res.data);
+
+  //         if (!res.data) {
+  //           var userEmail = "";
+  //           if (sessionStorage.getItem("userEmail")) {
+  //             userEmail = sessionStorage.getItem("userEmail");
+  //           } else {
+  //             userEmail = localStorage.getItem("userEmail");
+  //           }
+  //           setAccess(true);
+  //           axios
+  //             .get(`api/user/detail`, {
+  //               params: {
+  //                 userEmail: userEmail,
+  //               },
+  //               headers: {
+  //                 Authorization: `Bearer ${token}`,
+  //               },
+  //             })
+  //             .then((res) => {
+  //               console.log(res.data);
+  //               sessionStorage.setItem("userInfo", JSON.stringify(res.data));
+  //               setUserInfo(res.data);
+  //             })
+  //             .catch((err) => console.log(err));
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.log(err);
+  //       });
+  //   }
+  // }, []);
+
+  useEffect(() => {
+    setAccess(isLogin);
+  }, [isLogin]);
 
   // useEffect(() => {
   //   try {
@@ -118,16 +138,12 @@ function App() {
           <FontAwesomeIcon icon={faClose} />
         </span>
       </div>
-      <div className="alertPopUP">
-        <section className="contentSection">
-          <span className="closeAlertButton">
-            <FontAwesomeIcon icon={faClose} />
-          </span>
-          <span className="alertContent">잘못된 이메일 형식입니다.</span>
-        </section>
-        <div className="alertTimer" />
-      </div>
-      <Header isLogin={isLogin} setIsLogin={setIsLogin} />
+      <Header
+        isLogin={isLogin}
+        setIsLogin={setIsLogin}
+        userInfo={userInfo}
+        setUserInfo={setUserInfo}
+      />
       <Routes>
         <Route index="/" element={<MainPage isChanged={isChanged} />} />
         <Route path="/recent" element={<RecentPage />} />
@@ -148,6 +164,7 @@ function App() {
               authenticated={access}
               component={
                 <WritePage
+                  userInfo={userInfo}
                   USER={USER}
                   accountList={accountList}
                   postList={postList}

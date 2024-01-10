@@ -13,85 +13,95 @@ import moment from "moment";
 import "moment/locale/ko";
 
 export default function MainPage(props) {
-  const serverLocation = "http://localhost:8080";
   const { isChanged } = props;
+  const [posts, setPosts] = useState([]);
+  const [postElement, setPostElement] = useState([]);
   const [articles, setArticles] = useState();
   const [articleElement, setArticleElement] = useState();
 
-  // useEffect(() => {
-  //   axios
-  //     .get(`${serverLocation}/api/articles`)
-  //     .then((res) => {
-  //       setArticles(res.data);
-  //       console.log(res);
-  //     })
-  //     .catch((err) => console.log(err));
-  // }, []);
+  useEffect(() => {
+    axios
+      .get(`/api/post/all`, {
+        params: {
+          orderBy: "createdAt",
+        },
+      })
+      .then((res) => {
+        setPosts(res.data);
+        setArticles(res.data);
+        console.log(res);
+      })
+      .catch((err) => console.log(err));
+  }, []);
+
   useEffect(() => {
     try {
-      if (articles !== undefined) {
-        const articleList = articles.map((article) => {
-          const contentElement = new DOMParser()
-            .parseFromString(article.content, "text/html")
-            .querySelector("div");
-          let thumbnailJSX;
+      const postElementList = posts.map((post) => {
+        const contentElement = new DOMParser()
+          .parseFromString(post.content, "text/html")
+          .querySelector("div");
 
-          try {
-            const thumbnail = contentElement.querySelector("img");
+        var thumbnailJSX;
 
-            thumbnailJSX = React.createElement("div", {
-              dangerouslySetInnerHTML: {
-                __html: thumbnail.outerHTML,
-              },
-            });
-          } catch (err) {
-            thumbnailJSX = React.createElement("div");
-          }
+        try {
+          const thumbnail = contentElement.querySelector("img");
 
-          let firstText;
-          try {
-            const childNodes = Array.from(contentElement.childNodes);
-            const firstDIV = childNodes.find((item) => {
-              if (item.tagName === "DIV" && item.innerText !== "") {
-                return item;
-              }
-            });
-            firstText = firstDIV.innerText;
-          } catch (err) {
-            console.log(err);
-            firstText = "내용이 없습니다.";
-          }
-          const createAt = (date) => {
-            const createdAt = moment(date);
-            return <span className="createdAt">{createdAt.fromNow()}</span>;
-          };
+          thumbnailJSX = React.createElement("div", {
+            dangerouslySetInnerHTML: {
+              __html: thumbnail.outerHTML,
+            },
+          });
+        } catch (err) {
+          thumbnailJSX = React.createElement("div");
+        }
 
-          return (
-            <Link
-              to={`/articles/${article.publisher}/${article.id}`}
-              className="articleBox"
-            >
-              <div className="innerBox">
-                <div className="thumbnail">{thumbnailJSX}</div>
-                <span className="title">{article.title}</span>
-                <span className="content">{firstText}</span>
+        let firstText;
+        try {
+          const childNodes = Array.from(contentElement.childNodes);
+          const firstDIV = childNodes.find((item) => {
+            if (item.tagName === "DIV" && item.innerText !== "") {
+              return item;
+            }
+          });
+          firstText = firstDIV.innerText;
+        } catch (err) {
+          console.log(err);
+          firstText = "내용이 없습니다.";
+        }
+        const fromNow = (createdAt) => {
+          console.log(createdAt);
+          const momentAt = moment(createdAt);
+
+          return <span className="createdAt">{momentAt.fromNow()}</span>;
+        };
+
+        return (
+          <Link
+            key={post.postId}
+            to={`/post/${post.user.userId}/${post.postId}`}
+            className="postBox"
+          >
+            <div className="innerBox">
+              <div className="thumbnail">{thumbnailJSX}</div>
+              <span className="title">{post.title}</span>
+              <span className="content">{firstText}</span>
+            </div>
+            <span className="date">{fromNow(post.createdAt)}</span>
+            <section className="infoSection">
+              <div>
+                <div className="userIcon" />
+                <span className="userID">by {post.user.userEmail}</span>
               </div>
-              <span className="date">{createAt(article.createAt)}</span>
-              <section className="infoSection">
-                <div>
-                  <div className="userIcon" />
-                  <span className="userID">by {article.publisher}</span>
-                </div>
-              </section>
-            </Link>
-          );
-        });
-        setArticleElement(articleList);
-      }
-    } catch (e) {
-      console.error(e);
+            </section>
+          </Link>
+        );
+      });
+      setPostElement(postElementList);
+    } catch (err) {
+      console.error(err);
     }
-  }, [articles, isChanged]);
+  }, [posts]);
+
   return (
     <div>
       <section className={"bodyContainer"}>
@@ -113,7 +123,7 @@ export default function MainPage(props) {
             <FontAwesomeIcon icon={faEllipsisVertical} />
           </button>
         </section>
-        <section className={"body"}>{articleElement}</section>
+        <section className={"body"}>{postElement}</section>
       </section>
     </div>
   );
