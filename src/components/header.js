@@ -12,7 +12,10 @@ import Modal from "react-modal";
 import axios from "axios";
 
 export default function Header(props) {
-  const { isLogin, setIsLogin, userInfo, setUserInfo } = props;
+  const { isLogin, setIsLogin } = props;
+
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
   const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
   const [userEmail, setUserEmail] = useState();
@@ -64,7 +67,6 @@ export default function Header(props) {
         })
         .then((res) => {
           sessionStorage.setItem("userInfo", JSON.stringify(res.data));
-          setUserInfo(res.data);
           setIsLogin(true);
         })
         .catch((err) => {
@@ -121,8 +123,6 @@ export default function Header(props) {
                 "userInfo",
                 JSON.stringify(userInfo)
               );
-
-              setUserInfo(res.data);
               setIsLogin(true);
               userIconButtonRef.current.style.backgroundColor = "";
             })
@@ -131,7 +131,7 @@ export default function Header(props) {
             });
 
           setShowModal(false);
-          navigate("/");
+          // navigate("/");
         })
         .catch((err) => {
           console.log(err);
@@ -404,7 +404,7 @@ export default function Header(props) {
         <div className="logos">
           <Link className="logoImage">J</Link>
           <Link to={"/"} className={"logoString"}>
-            {!isLogin ? "jelog" : userInfo.userEmail + ".log"}
+            {!isLogin ? "jelog" : userInfo.userNickName + ".log"}
           </Link>
         </div>
         <div className={"buttons"}>
@@ -426,7 +426,15 @@ export default function Header(props) {
               새 글 작성
             </Link>
           )}
-          {isLogin && <button ref={userIconButtonRef} className="userIcon" />}
+          {isLogin && (
+            <button
+              ref={userIconButtonRef}
+              className="userIcon"
+              style={{
+                backgroundColor: userInfo.userIcon,
+              }}
+            />
+          )}
           {isLogin && (
             <button
               ref={userMenuButtonRef}
@@ -453,9 +461,9 @@ export default function Header(props) {
           </Link>
           <span className="buttonReadList">읽기 목록</span>
           <span className="buttonSetting">설정</span>
-          <Link to={"/"} className="buttonLogout" onClick={onClickLogoutButton}>
+          <span className="buttonLogout" onClick={onClickLogoutButton}>
             로그아웃
-          </Link>
+          </span>
         </section>
       </section>
     </div>
