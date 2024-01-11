@@ -14,6 +14,7 @@ import "moment/locale/ko";
 
 export default function MainPage(props) {
   const { isChanged } = props;
+  const [orderBy, setOrderBy] = useState("createdAt");
   const [posts, setPosts] = useState([]);
   const [postElement, setPostElement] = useState([]);
   const [articles, setArticles] = useState();
@@ -23,7 +24,7 @@ export default function MainPage(props) {
     axios
       .get(`/api/post/all`, {
         params: {
-          orderBy: "createdAt",
+          orderBy: orderBy,
         },
       })
       .then((res) => {
@@ -69,7 +70,6 @@ export default function MainPage(props) {
           firstText = "내용이 없습니다.";
         }
         const fromNow = (createdAt) => {
-          console.log(createdAt);
           const momentAt = moment(createdAt);
 
           return <span className="createdAt">{momentAt.fromNow()}</span>;
@@ -78,7 +78,7 @@ export default function MainPage(props) {
         return (
           <Link
             key={post.postId}
-            to={`/post/${post.user.userId}/${post.postId}`}
+            to={`/post/${post.user.userNickName}/${post.postId}`}
             className="postBox"
           >
             <div className="innerBox">
@@ -89,8 +89,13 @@ export default function MainPage(props) {
             <span className="date">{fromNow(post.createdAt)}</span>
             <section className="infoSection">
               <div>
-                <div className="userIcon" />
-                <span className="userID">by {post.user.userEmail}</span>
+                <div
+                  className="userIcon"
+                  style={{
+                    backgroundColor: post.user.userIcon,
+                  }}
+                />
+                <span className="userID">by {post.user.userNickName}</span>
               </div>
             </section>
           </Link>
@@ -102,19 +107,24 @@ export default function MainPage(props) {
     }
   }, [posts]);
 
+  const changeOrderBy = (e) => {
+    console.log(e.target.className);
+    setOrderBy(e.target.className);
+  };
+
   return (
     <div>
       <section className={"bodyContainer"}>
         <section className={"header"}>
           <div className={"tags"}>
-            <Link to={"/"} className={"trend"}>
+            <button className="likes" onClick={changeOrderBy}>
               <FontAwesomeIcon icon={faArrowTrendUp} />
               트렌딩
-            </Link>
-            <Link to={"/recent"} className={"recentPost"}>
+            </button>
+            <button className="createdAt" onClick={changeOrderBy}>
               <FontAwesomeIcon icon={faClock} />
               최신
-            </Link>
+            </button>
             <span className={"sortBy"}>
               이번주 <FontAwesomeIcon icon={faArrowDown} />
             </span>
