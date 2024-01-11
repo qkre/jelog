@@ -13,7 +13,9 @@ import axios from "axios";
 import imageCompression from "browser-image-compression";
 
 export default function WritePage(props) {
-  const { userInfo } = props;
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+  const token = sessionStorage.getItem("token");
+
   const [userEmail, setUserEmail] = useState();
   const [tagList, setTagList] = useState([]);
   const [tagElement, setTagElement] = useState([]);
@@ -47,6 +49,8 @@ export default function WritePage(props) {
 
   useEffect(() => {
     document.querySelector(".headerContainer").classList.add("hide");
+
+    window.addEventListener("popstate", handleBack);
   }, []);
 
   useEffect(() => {
@@ -59,6 +63,12 @@ export default function WritePage(props) {
     });
     setTagElement(newTagElement);
   }, [tagList]);
+
+  const handleBack = () => {
+    document.querySelector(".headerContainer").classList.remove("hide");
+    console.log("뒤로 가기 버튼이 클릭 되었습니다.");
+    window.removeEventListener("popstate", handleBack);
+  };
 
   const handleTitleChange = () => {
     titleTextareaRef.current.style.height = "auto";
@@ -136,27 +146,28 @@ export default function WritePage(props) {
       console.log(file);
       formData.append("file", file);
 
-      try {
-        const response = await axios.post(`api/uploadImage`, formData, {
+      await axios
+        .post("api/image/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
           },
-        });
-        const imageURL = response.data;
-        console.log("InsertImageToEditor Start");
-        await insertImageToEditor(imageURL);
-        console.log("InsertImageToEditor End");
-
-        // handleContentChange();
-      } catch (err) {
-        console.error("Error uploadTets : ", err);
-      }
+        })
+        .then(async (res) => {
+          console.log(res.data);
+          console.log("InsertImageToEditor Start");
+          await insertImageToEditor(res.data.accessPath, res.data.fileName);
+          console.log("InsertImageToEditor End");
+        })
+        .catch((err) => console.error(err));
     }
   };
 
-  const insertImageToEditor = async (imageURL) => {
+  const insertImageToEditor = async (accessPath, fileName) => {
     const imgTag = document.createElement("img");
-    imgTag.src = imageURL;
+
+    imgTag.src = accessPath + "?fileName=" + fileName;
+
     const sel = window.getSelection();
     let range;
 
@@ -239,11 +250,11 @@ export default function WritePage(props) {
             userEmail: userInfo.userEmail,
             title: title,
             content: content,
-            tags: tagList.toString(),
+            tags: tagList,
           },
           {
             headers: {
-              Authorization: `Bearer ${sessionStorage.getItem("token")}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         )
@@ -271,16 +282,6 @@ export default function WritePage(props) {
         isSavedPost: true,
       };
 
-      // if (USER.saveIndex > 0) {
-      //   const modifiedList = [...USER.savedPost];
-      //   modifiedList[USER.saveIndex] = savePost;
-      //   USER.savedPost = modifiedList;
-      // } else {
-      //   USER.savedPost.push(savePost);
-      // }
-      // USER.saveIndex += 1;
-      // localStorage.setItem("accountList", JSON.stringify(accountList));
-      // localStorage.setItem("USER", JSON.stringify(USER));
       showAlertPopUp();
     }
   };
@@ -393,6 +394,8 @@ export default function WritePage(props) {
             to={"/"}
             className={"buttonExit"}
             onClick={() => {
+              window.removeEventListener("popstate", handleBack);
+
               const headerContainer =
                 document.querySelector(".headerContainer");
               headerContainer.classList.remove("hide");
