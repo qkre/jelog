@@ -10,17 +10,21 @@ import { Link, useLocation } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import moment from "moment";
+import Modal from "react-modal";
 import "moment/locale/ko";
 
 export default function PostPage(props) {
   const serverLocation = "http://localhost:8080";
 
-  const { USER, setIsDeleteModalOpen, setDeletePostInfo } = props;
-  const [articleInfo, setArticleInfo] = useState();
-  const [articleElement, setArticleElement] = useState();
+  const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+
+  const { isLogin } = props;
+  const [postInfo, setPostInfo] = useState(null);
+  const [postElement, setPostElement] = useState();
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const location = useLocation().pathname;
-  const publisher = location.split("/")[2];
-  const articleID = parseInt(location.split("/")[3]);
+  const userNickName = location.split("/")[2];
+  const postId = location.split("/")[3];
   const likesCountRef = useRef();
 
   const createAt = (date) => {
@@ -32,36 +36,44 @@ export default function PostPage(props) {
     setIsDeleteModalOpen(true);
   };
 
+  const deleteModalFunctions = {
+    closeModal: () => {
+      setIsDeleteModalOpen(false);
+    },
+    onClickButtonConfirm: () => {
+      deleteModalFunctions.closeModal();
+      axios
+        .delete(`/api/post/delete/${userNickName}/${postId}`)
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => console.error(err));
+    },
+  };
+
   useEffect(() => {
     axios
-      .get(`${serverLocation}/api/articles/${publisher}/${articleID}`)
-      .then((res) => setArticleInfo(res.data))
-      .catch((err) => console.log(err));
-    setDeletePostInfo({
-      publisher,
-      articleID,
-    });
+      .get(`/api/post/read/${userNickName}/${postId}`)
+      .then((res) => {
+        console.log(res.data);
+        setPostInfo(res.data);
+      })
+      .catch((err) => console.error(err));
   }, []);
 
   useEffect(() => {
-    if (articleInfo !== undefined) {
-      let articleFunctions = "articleFunctions hide";
-
-      if (USER !== undefined && articleInfo.publisher === USER.userID) {
-        articleFunctions = articleFunctions.split(" ")[0];
-      }
-
+    if (postInfo != null) {
       const contentElement = new DOMParser()
-        .parseFromString(articleInfo.content, "text/html")
+        .parseFromString(postInfo.content, "text/html")
         .querySelector("div");
 
-      const tagElement = articleInfo.tags.split(",").map((tag) => {
+      const tagElement = postInfo.tags.map((tag) => {
         return <div className="tag">{tag}</div>;
       });
 
-      const article = (
+      const post = (
         <div>
-          <section className="articleContainer">
+          <section className="postContainer">
             <section className="sideBarSection">
               <div className="sideBarMenu">
                 <button className="buttonLike">
@@ -77,29 +89,33 @@ export default function PostPage(props) {
             </section>
             <section className="mainSection">
               <section className="headerSection">
-                <span className="title">{articleInfo.title}</span>
-                <section className="articleInfoSection">
+                <span className="title">{postInfo.title}</span>
+                <section className="postInfoSection">
                   <div className="publishInfo">
-                    <span className="publisher">{articleInfo.publisher}</span>
-                    {createAt(articleInfo.createAt)}
-                  </div>
-                  <div className={articleFunctions}>
-                    <span className="buttonStat">통계</span>
-                    <Link
-                      to={`/write/${publisher}/${articleID}`}
-                      className="buttonMod"
-                      onClick={() => {
-                        document
-                          .querySelector(".headerContainer")
-                          .classList.add("hide");
-                      }}
-                    >
-                      수정
-                    </Link>
-                    <span className="buttonDelete" onClick={showModal}>
-                      삭제
+                    <span className="userNickName">
+                      {postInfo.user.userNickName}
                     </span>
+                    {createAt(postInfo.createAt)}
                   </div>
+                  {isLogin && userNickName === userInfo.userNickName && (
+                    <div className="postFunctions">
+                      <span className="buttonStat">통계</span>
+                      <Link
+                        to={`/write/${userNickName}/${postId}`}
+                        className="buttonMod"
+                        onClick={() => {
+                          document
+                            .querySelector(".headerContainer")
+                            .classList.add("hide");
+                        }}
+                      >
+                        수정
+                      </Link>
+                      <span className="buttonDelete" onClick={showModal}>
+                        삭제
+                      </span>
+                    </div>
+                  )}
                 </section>
                 <section className={"tagSection"}>{tagElement}</section>
               </section>
@@ -131,10 +147,37 @@ export default function PostPage(props) {
           </section>
         </div>
       );
-
-      setArticleElement(article);
+      setPostElement(post);
     }
-  }, [articleInfo]);
+  }, [postInfo]);
 
-  return <div>{articleElement}</div>;
+  return (
+    <div>
+      <Modal
+        className={"deleteModal"}
+        isOpen={isDeleteModalOpen}
+        onRequestClose={deleteModalFunctions.closeModal}
+      >
+        <span className={"modalTitle"}>포스트 삭제</span>
+        <span className={"modalContent"}>정말로 삭제하시겠습니까?</span>
+        <div className={"modalButtons"}>
+          <button
+            className={"buttonCancel"}
+            onClick={deleteModalFunctions.closeModal}
+          >
+            {" "}
+            취소
+          </button>
+          <Link
+            to={"/"}
+            className={"buttonConfirm"}
+            onClick={deleteModalFunctions.onClickButtonConfirm}
+          >
+            확인
+          </Link>
+        </div>
+      </Modal>
+      {postElement}
+    </div>
+  );
 }

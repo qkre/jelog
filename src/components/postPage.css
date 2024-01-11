@@ -2,23 +2,23 @@ button {
   cursor: pointer;
 }
 
-.articleContainer {
+.postContainer {
   padding: 20px 100px 20px 100px;
   display: flex;
   justify-content: space-between;
 }
 
-.articleContainer img {
+.postContainer img {
   max-width: 60vw;
 }
 
-.articleContainer .sideBarSection {
+.postContainer .sideBarSection {
   flex: 1;
   display: flex;
   justify-content: end;
 }
 
-.articleContainer .sideBarSection .sideBarMenu {
+.postContainer .sideBarSection .sideBarMenu {
   width: 60px;
   height: 150px;
   border-radius: 50px;
@@ -30,7 +30,7 @@ button {
   text-align: center;
 }
 
-.articleContainer .sideBarSection .sideBarMenu button {
+.postContainer .sideBarSection .sideBarMenu button {
   font-size: 20px;
   background-color: white;
   padding: 10px;
@@ -38,11 +38,11 @@ button {
   color: gray;
 }
 
-.articleContainer .sideBarSection .sideBarMenu .likesCount {
+.postContainer .sideBarSection .sideBarMenu .likesCount {
   padding: 10px;
 }
 
-.articleContainer .mainSection {
+.postContainer .mainSection {
   flex: 8;
   padding: 10px;
   display: flex;
@@ -50,62 +50,58 @@ button {
   margin: 0px 30px;
 }
 
-.articleContainer .mainSection .headerSection .title {
+.postContainer .mainSection .headerSection .title {
   font-size: 40px;
   font-weight: 800;
 }
 
-.articleContainer .mainSection .headerSection .articleInfoSection {
+.postContainer .mainSection .headerSection .postInfoSection {
   display: flex;
   margin: 10px 0px 10px 0px;
   justify-content: space-between;
 }
 
-.articleContainer
+.postContainer
   .mainSection
   .headerSection
-  .articleInfoSection
+  .postInfoSection
   .publishInfo
   .userID {
   font-weight: 600;
   margin-right: 10px;
 }
 
-.articleContainer
+.postContainer
   .mainSection
   .headerSection
-  .articleInfoSection
+  .postInfoSection
   .publishInfo
   .createdAt {
   margin-left: 5px;
   color: grey;
 }
 
-.articleContainer
-  .mainSection
-  .headerSection
-  .articleInfoSection
-  .articleFunctions {
+.postContainer .mainSection .headerSection .postInfoSection .postFunctions {
   color: grey;
   cursor: pointer;
 }
 
-.articleContainer
+.postContainer
   .mainSection
   .headerSection
-  .articleInfoSection
-  .articleFunctions
+  .postInfoSection
+  .postFunctions
   .buttonMod {
   margin: 0px 5px 0px 5px;
   color: grey;
   text-decoration: none;
 }
 
-.articleContainer .mainSection .headerSection .tagSection {
+.postContainer .mainSection .headerSection .tagSection {
   display: flex;
 }
 
-.articleContainer .mainSection .headerSection .tagSection * {
+.postContainer .mainSection .headerSection .tagSection * {
   color: var(--velog-green);
   padding: 2.5px 10px;
   background-color: var(--velog-grey);
@@ -113,7 +109,7 @@ button {
   border-radius: 50px;
 }
 
-.articleContainer .mainSection .seriesSection {
+.postContainer .mainSection .seriesSection {
   padding: 20px;
   margin: 20px 0px 50px 0px;
   background-color: var(--velog-grey);
@@ -122,38 +118,28 @@ button {
   border-radius: 5px;
 }
 
-.articleContainer .mainSection .seriesSection .seriesTitle {
+.postContainer .mainSection .seriesSection .seriesTitle {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 40px;
 }
 
-.articleContainer .mainSection .seriesSection .indicators {
+.postContainer .mainSection .seriesSection .indicators {
   display: flex;
   justify-content: space-between;
 }
 
-.articleContainer .mainSection .seriesSection .indicators .buttonShowList {
+.postContainer .mainSection .seriesSection .indicators .buttonShowList {
   background-color: var(--velog-grey);
 }
 
-.articleContainer
-  .mainSection
-  .seriesSection
-  .indicators
-  .pageIndicators
-  .pages {
+.postContainer .mainSection .seriesSection .indicators .pageIndicators .pages {
   font-size: 14px;
   color: grey;
   margin-right: 10px;
 }
 
-.articleContainer
-  .mainSection
-  .seriesSection
-  .indicators
-  .pageIndicators
-  button {
+.postContainer .mainSection .seriesSection .indicators .pageIndicators button {
   width: 17.5px;
   height: 18px;
   font-weight: 800;
@@ -163,15 +149,15 @@ button {
   border-radius: 50%;
 }
 
-.articleContainer .mainSection .contentSection {
+.postContainer .mainSection .contentSection {
   max-width: 50vw;
 }
 
-.articleContainer .mainSection .contentSection img {
+.postContainer .mainSection .contentSection img {
   width: 100%;
 }
 
-.articleContainer .summarySection {
+.postContainer .summarySection {
   flex: 1;
   /* border: 2px solid red; */
   display: flex;
@@ -179,7 +165,7 @@ button {
   margin-left: 10px;
 }
 
-.articleContainer .summarySection .summaryIndexes {
+.postContainer .summarySection .summaryIndexes {
   display: flex;
   flex-direction: column;
   max-width: 200px;
