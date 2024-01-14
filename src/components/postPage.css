@@ -36,6 +36,11 @@ button {
   padding: 10px;
   border-radius: 50%;
   color: gray;
+  cursor: pointer;
+}
+
+.postContainer .sideBarSection .sideBarMenu .buttonUnlike {
+  color: var(--velog-green);
 }
 
 .postContainer .sideBarSection .sideBarMenu .likesCount {
