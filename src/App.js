@@ -24,6 +24,7 @@ function App() {
   const [isLogin, setIsLogin] = useState(false);
 
   useEffect(() => {
+    console.log("현재 로그인 상태 : ", isLogin);
     setAccess(isLogin);
   }, [isLogin]);
 
