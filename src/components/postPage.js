@@ -14,13 +14,13 @@ import Modal from "react-modal";
 import "moment/locale/ko";
 
 export default function PostPage(props) {
-  const serverLocation = "http://localhost:8080";
-
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
+  const token = sessionStorage.getItem("token");
 
   const { isLogin } = props;
   const [postInfo, setPostInfo] = useState(null);
   const [postElement, setPostElement] = useState();
+  const [isLiked, setIsLiked] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const location = useLocation().pathname;
   const userNickName = location.split("/")[2];
@@ -50,6 +50,70 @@ export default function PostPage(props) {
         .catch((err) => console.error(err));
     },
   };
+  const onClickLikeButton = () => {
+    if (isLogin) {
+      axios
+        .post(
+          "/api/post/like/add",
+          {
+            postId: postInfo.postId,
+            userId: userInfo.userId,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          setIsLiked(true);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const onClickUnlikeButton = () => {
+    if (isLogin) {
+      axios
+        .delete("/api/post/like/delete", {
+          data: {
+            postId: postInfo.postId,
+            userId: userInfo.userId,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          setIsLiked(false);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  const isAlreadyLiked = (data) => {
+    if (data.postLike.find((like) => like.userId === userInfo.userId)) {
+      return true;
+    }
+    return false;
+  };
+
+  useEffect(() => {
+    axios
+      .get(`/api/post/read/${userNickName}/${postId}`)
+      .then((res) => {
+        console.log("첫 로딩");
+        const result = isAlreadyLiked(res.data);
+        setIsLiked(result);
+      })
+      .catch((err) => console.error(err));
+  }, [userNickName, postId]);
 
   useEffect(() => {
     axios
@@ -59,7 +123,7 @@ export default function PostPage(props) {
         setPostInfo(res.data);
       })
       .catch((err) => console.error(err));
-  }, []);
+  }, [isLiked]);
 
   useEffect(() => {
     if (postInfo != null) {
@@ -70,17 +134,25 @@ export default function PostPage(props) {
       const tagElement = postInfo.tags.map((tag) => {
         return <div className="tag">{tag}</div>;
       });
-
       const post = (
         <div>
           <section className="postContainer">
             <section className="sideBarSection">
               <div className="sideBarMenu">
-                <button className="buttonLike">
-                  <FontAwesomeIcon icon={faHeart} />
-                </button>
+                {isLiked ? (
+                  <button
+                    className="buttonUnlike"
+                    onClick={onClickUnlikeButton}
+                  >
+                    <FontAwesomeIcon icon={faHeart} />
+                  </button>
+                ) : (
+                  <button className="buttonLike" onClick={onClickLikeButton}>
+                    <FontAwesomeIcon icon={faHeart} />
+                  </button>
+                )}
                 <span ref={likesCountRef} className="likesCount">
-                  1
+                  {postInfo.postLike.length}
                 </span>
                 <button className="buttonShare">
                   <FontAwesomeIcon icon={faShare} />
