@@ -22,11 +22,16 @@ import PrivateRoute from "./lib/privateRoute";
 function App() {
   const [access, setAccess] = useState(false);
   const [isLogin, setIsLogin] = useState(false);
+  const [location, setLocation] = useState("/");
 
   useEffect(() => {
     console.log("현재 로그인 상태 : ", isLogin);
     setAccess(isLogin);
   }, [isLogin]);
+
+  useEffect(() => {
+    console.log("현재 주소", location);
+  }, [location]);
 
   return (
     <BrowserRouter>
@@ -42,7 +47,9 @@ function App() {
         <Route path="/recent" element={<RecentPage />} />
         <Route
           path="/post/:userNickName/:postId"
-          element={<PostPage isLogin={isLogin} />}
+          element={
+            <PostPage isLogin={isLogin} setIsLocaitonChange={setLocation} />
+          }
         />
         <Route
           path="/write"
