@@ -135,6 +135,7 @@ export default function Header(props) {
         })
         .catch((err) => {
           console.log(err);
+          showAlertPopUp(err.response.data);
         });
     } else {
       if (await isEmailVaild()) {
@@ -266,22 +267,6 @@ export default function Header(props) {
 
     console.log("현재 모달 창 상태 :: " + modalState);
   };
-
-  useEffect(() => {
-    console.log("현재 로그인 상태 : " + isLogin);
-    // if (!isLogin) {
-    //   console.log(isLogin);
-    //   writeButtonRef.current.classList.add("hide");
-    //   userIconButtonRef.current.classList.add("hide");
-    //   userMenuButtonRef.current.classList.add("hide");
-    //   loginButtonRef.current.classList.remove("hide");
-    // } else {
-    //   writeButtonRef.current.classList.remove("hide");
-    //   userIconButtonRef.current.classList.remove("hide");
-    //   userMenuButtonRef.current.classList.remove("hide");
-    //   loginButtonRef.current.classList.add("hide");
-    // }
-  }, [isLogin]);
 
   const remeberCheck = (e) => {
     setIsRemember(e.target.checked);
