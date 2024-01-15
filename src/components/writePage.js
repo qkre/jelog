@@ -16,7 +16,6 @@ export default function WritePage(props) {
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
   const token = sessionStorage.getItem("token");
 
-  const [userEmail, setUserEmail] = useState();
   const [tagList, setTagList] = useState([]);
   const [tagElement, setTagElement] = useState([]);
 
@@ -147,7 +146,7 @@ export default function WritePage(props) {
       formData.append("file", file);
 
       await axios
-        .post("api/image/upload", formData, {
+        .post("api/private/image/upload", formData, {
           headers: {
             "Content-Type": "multipart/form-data",
             Authorization: `Bearer ${token}`,
@@ -239,14 +238,13 @@ export default function WritePage(props) {
         }
       }
 
-      const publisher = localStorage.getItem("userEmail");
-
       console.log(tagList);
 
       axios
         .post(
-          `api/post/write`,
+          `api/private/post`,
           {
+            token: token,
             userEmail: userInfo.userEmail,
             title: title,
             content: content,
@@ -268,22 +266,21 @@ export default function WritePage(props) {
   };
 
   const handleAddSavePost = () => {
-    if (!isError) {
-      const today = new Date();
-      const title = titleTextareaRef.current.value;
-      const content = previewContentRef.current.outerHTML;
-      const savePost = {
-        userEmail: userEmail,
-        id: 1,
-        title: title,
-        content: content,
-        date: today.toLocaleDateString(),
-        likesCount: 0,
-        isSavedPost: true,
-      };
-
-      showAlertPopUp();
-    }
+    // if (!isError) {
+    //   const today = new Date();
+    //   const title = titleTextareaRef.current.value;
+    //   const content = previewContentRef.current.outerHTML;
+    //   const savePost = {
+    //     userEmail: userEmail,
+    //     id: 1,
+    //     title: title,
+    //     content: content,
+    //     date: today.toLocaleDateString(),
+    //     likesCount: 0,
+    //     isSavedPost: true,
+    //   };
+    //   showAlertPopUp();
+    // }
   };
 
   const showAlertPopUp = () => {

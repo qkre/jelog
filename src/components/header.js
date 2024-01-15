@@ -57,9 +57,10 @@ export default function Header(props) {
 
     if (token != null) {
       axios
-        .get(`/api/user/detail`, {
+        .get(`/api/private/user`, {
           params: {
             userEmail: userEmail,
+            token: token,
           },
           headers: {
             Authorization: `Bearer ${token}`,
@@ -88,19 +89,19 @@ export default function Header(props) {
   const onClickLoginButton = async () => {
     if (modalState === "login") {
       axios
-        .post(`/api/user/login`, {
+        .post(`/api/public/user/login`, {
           userEmail: userEmail,
           userPw: userPw,
         })
         .then((res) => {
           console.log(res.data);
-          const message = res.data.message;
           const token = res.data.token;
 
           axios
-            .get(`/api/user/detail`, {
+            .get(`/api/private/user`, {
               params: {
                 userEmail: userEmail,
+                token: token,
               },
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -124,7 +125,6 @@ export default function Header(props) {
                 JSON.stringify(userInfo)
               );
               setIsLogin(true);
-              userIconButtonRef.current.style.backgroundColor = "";
             })
             .catch((err) => {
               console.error(err);
@@ -143,7 +143,7 @@ export default function Header(props) {
         const userIcon =
           "#" + Math.floor(Math.random() * 0xffffff).toString(16);
         axios
-          .post(`/api/user/register`, {
+          .post(`/api/public/user/register`, {
             userEmail: userEmail,
             userPw: userPw,
             userIcon: userIcon,
@@ -164,9 +164,11 @@ export default function Header(props) {
           })
           .catch((err) => {
             const message = err.response.data;
+            console.error(err);
             showAlertPopUp(message);
           });
       } else {
+        console.log("여기야");
         showAlertPopUp(`${userEmail} 은 이미 존재하는 계정입니다.`);
       }
     }
@@ -174,15 +176,15 @@ export default function Header(props) {
 
   const isEmailVaild = async () => {
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^s@]+$/;
-    var isUnique = true;
+    var isUnique = false;
     await axios
-      .get(`/api/user/valid`, {
+      .get(`/api/public/user/valid`, {
         params: {
           userEmail: userEmail,
         },
       })
       .then((res) => {
-        isUnique = false;
+        isUnique = true;
       })
       .catch((err) => {
         console.error(err);
@@ -200,7 +202,6 @@ export default function Header(props) {
       ".alertPopUP .contentSection .alertContent"
     );
     alertContent.innerText = message;
-    console.log(alertContent);
     alertPopUP.style.display = "flex";
     setTimeout(() => {
       alertPopUP.style.display = "none";

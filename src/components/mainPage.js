@@ -22,7 +22,7 @@ export default function MainPage(props) {
 
   useEffect(() => {
     axios
-      .get(`/api/post/all`, {
+      .get(`/api/public/post/all`, {
         params: {
           orderBy: orderBy,
         },
