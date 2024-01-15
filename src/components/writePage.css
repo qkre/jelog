@@ -18,8 +18,12 @@
   background-color: aliceblue;
 }
 
-.writeContainer .inputSection input,
-button {
+.writeContainer .inputSection input {
+  border: none;
+  background-color: white;
+}
+
+.writeContainer .inputSection button {
   border: none;
   background-color: white;
 }

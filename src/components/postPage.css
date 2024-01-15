@@ -211,13 +211,13 @@ button {
   padding: 5px;
 }
 
-.postContainer .footer {
+.postContainer .recentSection {
   display: flex;
   width: 75%;
   justify-content: space-between;
 }
 
-.postContainer .footer .prevContainer {
+.postContainer .recentSection .prevContainer {
   width: 45%;
   background-color: var(--velog-grey);
   padding: 20px;
@@ -228,7 +228,7 @@ button {
   color: black;
 }
 
-.postContainer .footer .nextContainer {
+.postContainer .recentSection .nextContainer {
   width: 45%;
   background-color: var(--velog-grey);
   padding: 20px;
@@ -239,7 +239,7 @@ button {
   color: black;
 }
 
-.postContainer .footer button {
+.postContainer .recentSection button {
   background-color: var(--velog-grey);
   color: var(--velog-green);
   font-size: 16pt;
@@ -249,22 +249,139 @@ button {
   margin: 0px 20px 0px 0px;
 }
 
-.postContainer .footer .buttonNext {
+.postContainer .recentSection .buttonNext {
   margin: 0px 0px 0px 20px;
 }
 
-.postContainer .footer .contentSection {
+.postContainer .recentSection .contentSection {
   display: flex;
   flex-direction: column;
 }
 
-.postContainer .footer .contentSection .title {
+.postContainer .recentSection .contentSection .title {
   font-size: 12pt;
 }
 
-.postContainer .footer .contentSection .content {
+.postContainer .recentSection .contentSection .content {
   font-size: 16pt;
   font-weight: bold;
+}
+
+.postContainer .commentInputSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.postContainer .commentInputSection .title {
+  font-size: 16pt;
+  font-weight: bold;
+}
+
+.postContainer .commentInputSection .content {
+  margin: 10px 0px;
+  padding: 10px;
+}
+
+.postContainer .commentInputSection .buttonSection {
+  display: flex;
+  justify-content: end;
+}
+
+.postContainer .commentInputSection .buttonSection .addCommentsButton {
+  padding: 10px;
+  background-color: var(--velog-green);
+  border-radius: 5px;
+  border: none;
+  color: white;
+  font-weight: 600;
+  text-decoration: none;
+  justify-content: center;
+  align-items: center;
+}
+
+.postContainer .commentSection {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.postContainer .commentSection .header {
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.postContainer .commentSection .header .userInfo {
+  display: flex;
+  align-items: center;
+}
+
+.postContainer .commentSection .header .userInfo .userIcon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin: 10px;
+}
+
+.postContainer .commentSection .header .userInfo .commentInfo {
+  display: flex;
+  flex-direction: column;
+}
+
+.postContainer .commentSection .header .commentFunctions {
+  display: flex;
+}
+
+.postContainer .commentSection .header .commentFunctions button {
+  padding: 2px;
+  border: none;
+  background-color: white;
+}
+
+.postContainer .commentSection .content {
+  padding: 30px 0px;
+}
+
+.postContainer textarea {
+  padding: 10px;
+  margin: 20px 0px;
+}
+
+.postContainer .commentSection .editCommentSection {
+  display: flex;
+  flex-direction: column;
+}
+
+.postContainer .commentSection .editCommentSection .editCommentButtons {
+  display: flex;
+  justify-content: end;
+}
+
+.postContainer
+  .commentSection
+  .editCommentSection
+  .editCommentButtons
+  .cancelButton {
+  border: none;
+  background-color: white;
+  color: var(--velog-green);
+  padding: 10px 20px;
+  font-weight: 800;
+}
+
+.postContainer
+  .commentSection
+  .editCommentSection
+  .editCommentButtons
+  .modifyConfirmButton {
+  border: none;
+  background-color: var(--velog-green);
+  color: white;
+  padding: 10px 20px;
+  font-weight: 800;
+  border-radius: 5px;
 }
 
 .deleteModal {

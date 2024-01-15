@@ -4,7 +4,7 @@
   box-sizing: border-box;
 }
 
-.header {
+.headerContainer .header {
   padding: 10px 5%;
   /* border: 2px solid red; */
   display: flex;
@@ -13,14 +13,14 @@
   margin-bottom: 20px;
 }
 
-.header .logos {
+.headerContainer .header .logos {
   /* border: 2px solid blue; */
   display: flex;
   align-items: center;
   cursor: pointer;
 }
 
-.header .logos .logoImage {
+.headerContainer .header .logos .logoImage {
   color: white;
   background-color: black;
   border-radius: 5px;
@@ -34,7 +34,7 @@
   margin-right: 10px;
 }
 
-.header .logos .logoString {
+.headerContainer .header .logos .logoString {
   font-size: 24px;
   font-weight: bold;
   border: none;
@@ -44,13 +44,13 @@
   /* border: 2px solid black; */
 }
 
-.header .buttons {
+.headerContainer .header .buttons {
   /* border: 2px solid blue; */
   display: flex;
   align-items: center;
 }
 
-.header .buttons > button {
+.headerContainer .header .buttons > button {
   border: none;
   font-size: 20px;
   /* border: 2px solid black; */
@@ -59,7 +59,7 @@
   margin-left: 20px;
 }
 
-.header .buttons .newPost {
+.headerContainer .header .buttons .newPost {
   border: 2px solid black;
   border-radius: 50px;
   padding: 5px 15px 5px 15px;
@@ -72,18 +72,18 @@
   transition: 0.25s;
 }
 
-.header .buttons .newPost:hover {
+.headerContainer .header .buttons .newPost:hover {
   color: white;
   background-color: black;
 }
 
-.header .buttons .userIcon {
+.headerContainer .header .buttons .userIcon {
   width: 35px;
   height: 35px;
   border-radius: 50%;
 }
 
-.header .buttons .login {
+.headerContainer .header .buttons .login {
   border: 2px solid black;
   border-radius: 50px;
   padding: 5px 15px 5px 15px;
@@ -97,7 +97,7 @@
   background-color: black;
 }
 
-.header .buttons .login:hover {
+.headerContainer .header .buttons .login:hover {
   background-color: rgb(50, 50, 50);
 }
 
@@ -217,7 +217,7 @@
   cursor: pointer;
 }
 
-.header .moreInfoSection {
+.headerContainer .header .moreInfoSection {
   width: 150px;
   display: none;
   flex-direction: column;
@@ -228,7 +228,7 @@
   background-color: white;
 }
 
-.header .moreInfoSection * {
+.headerContainer .header .moreInfoSection * {
   padding: 10px;
   cursor: pointer;
   font-weight: 500;
@@ -236,7 +236,7 @@
   text-decoration: none;
 }
 
-.header .moreInfoSection *:hover {
+.headerContainer .header .moreInfoSection *:hover {
   color: var(--velog-green);
   background-color: var(--velog-grey);
 }

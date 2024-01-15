@@ -13,6 +13,7 @@
 
 .bodyContainer .header {
   /* border: 2px solid blue; */
+  padding: 0px 5%;
   display: flex;
   justify-content: space-between;
   margin-bottom: 30px;
