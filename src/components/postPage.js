@@ -19,13 +19,18 @@ export default function PostPage(props) {
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
   const token = sessionStorage.getItem("token");
 
-  const navigator = useNavigate();
-
   const { isLogin, setLocation } = props;
   const [recentPosts, setRecentPosts] = useState(null);
   const [recentElement, setRecentElement] = useState();
   const [postInfo, setPostInfo] = useState(null);
   const [postElement, setPostElement] = useState();
+  const [commentInputElement, setCommentInputElement] = useState();
+  const [commentsElement, setCommentsElement] = useState();
+
+  const [commentEditMode, setCommentEditMode] = useState(false);
+
+  const [editableComment, setEditableComment] = useState();
+
   const [isLiked, setIsLiked] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
@@ -35,14 +40,17 @@ export default function PostPage(props) {
   const postId = location.split("/")[3];
 
   const likesCountRef = useRef();
-
-  const createAt = (date) => {
-    const createdAt = moment(date);
-    return <span className="createdAt">{createdAt.fromNow()}</span>;
-  };
+  const commentTextAreaRef = useRef();
+  const editCommentTextAreaRef = useRef();
 
   const showModal = () => {
     setIsDeleteModalOpen(true);
+  };
+
+  const fromNow = (createdAt) => {
+    const momentAt = moment(createdAt);
+
+    return <span className="createdAt">{momentAt.fromNow()}</span>;
   };
 
   const deleteModalFunctions = {
@@ -52,7 +60,11 @@ export default function PostPage(props) {
     onClickButtonConfirm: () => {
       deleteModalFunctions.closeModal();
       axios
-        .delete(`/api/post/delete/${userNickName}/${postId}`)
+        .delete(`/api/private/post`, {
+          token: token,
+          postId: postId,
+          userEmail: userInfo.userEmail,
+        })
         .then((res) => {
           console.log(res);
         })
@@ -63,10 +75,11 @@ export default function PostPage(props) {
     if (isLogin) {
       axios
         .post(
-          "/api/post/like/add",
+          "/api/private/post/like",
           {
+            token: token,
             postId: postInfo.postId,
-            userId: userInfo.userId,
+            userEmail: userInfo.userEmail,
           },
           {
             headers: {
@@ -87,10 +100,11 @@ export default function PostPage(props) {
   const onClickUnlikeButton = () => {
     if (isLogin) {
       axios
-        .delete("/api/post/like/delete", {
+        .delete("/api/private/post/like", {
           data: {
+            token: token,
             postId: postInfo.postId,
-            userId: userInfo.userId,
+            userEmail: userInfo.userEmail,
           },
           headers: {
             Authorization: `Bearer ${token}`,
@@ -107,7 +121,7 @@ export default function PostPage(props) {
   };
 
   const isAlreadyLiked = (data) => {
-    if (data.postLike.find((like) => like.userId === userInfo.userId)) {
+    if (data.postLikes.find((like) => like.userId === userInfo.userId)) {
       return true;
     }
     return false;
@@ -121,10 +135,61 @@ export default function PostPage(props) {
     setLocation(`/post/${userNickName}/${recentPosts.prev.postId}`);
   };
 
+  const onClickAddCommentsButton = () => {
+    axios
+      .post(
+        "/api/private/comment/write",
+        {
+          token: token,
+          userEmail: userInfo.userEmail,
+          postId: postInfo.postId,
+          content: commentTextAreaRef.current.value,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((res) => {
+        console.log(res.data);
+        window.location.reload();
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  };
+
+  const onClickCommentModifyButton = (commentId) => {
+    setEditableComment(commentId);
+    setCommentEditMode(!commentEditMode);
+  };
+
+  const onClickcommentModifyConfirmButton = (commentId) => {
+    axios
+      .put(
+        "/api/private/comment/write",
+        {
+          token: token,
+          userEmail: userInfo.userEmail,
+          postId: postId,
+          commentId: commentId,
+          content: editCommentTextAreaRef.current.value,
+        },
+        { headers: { Authorization: `Bearer ${token}` } }
+      )
+      .then((res) => {
+        console.log(res.data);
+        setEditableComment(null);
+        setCommentEditMode(!commentEditMode);
+      })
+      .catch((err) => console.log(err));
+  };
+
   useEffect(() => {
     if (postId != null && userNickName != null) {
       axios
-        .get(`/api/post/read/${userNickName}/${postId}`)
+        .get(`/api/public/post/${userNickName}/${postId}`)
         .then((res) => {
           console.log(res.data);
           const result = isAlreadyLiked(res.data);
@@ -137,18 +202,18 @@ export default function PostPage(props) {
   useEffect(() => {
     if (postId != null && userNickName != null) {
       axios
-        .get(`/api/post/read/${userNickName}/${postId}`)
+        .get(`/api/public/post/${userNickName}/${postId}`)
         .then((res) => {
           setPostInfo(res.data);
         })
         .catch((err) => console.error(err));
     }
-  }, [isLiked]);
+  }, [isLiked, editableComment]);
 
   useEffect(() => {
     if (postInfo != null) {
       axios
-        .get("/api/post/recent", {
+        .get("/api/public/post/recent", {
           params: { userId: postInfo.user.userId, postId: postInfo.postId },
         })
         .then((res) => {
@@ -178,7 +243,7 @@ export default function PostPage(props) {
                 </button>
               )}
               <span ref={likesCountRef} className="likesCount">
-                {postInfo.postLike.length}
+                {postInfo.postLikes.length}
               </span>
               <button className="buttonShare">
                 <FontAwesomeIcon icon={faShare} />
@@ -193,7 +258,7 @@ export default function PostPage(props) {
                   <span className="userNickName">
                     {postInfo.user.userNickName}
                   </span>
-                  {createAt(postInfo.createAt)}
+                  {fromNow(postInfo.createAt)}
                 </div>
                 {isLogin && userNickName === userInfo.userNickName && (
                   <div className="postFunctions">
@@ -244,14 +309,99 @@ export default function PostPage(props) {
           </section>
         </section>
       );
+
+      const commentInput = (
+        <section className="commentInputSection">
+          <span className="title">{postInfo.comments.length}개의 댓글</span>
+          <textarea
+            className="content"
+            ref={commentTextAreaRef}
+            placeholder="내용을 입력하세요..."
+          />
+          <section className="buttonSection">
+            <button
+              className="addCommentsButton"
+              onClick={onClickAddCommentsButton}
+            >
+              댓글 작성
+            </button>
+          </section>
+        </section>
+      );
+
+      const comments = postInfo.comments.map((comment) => {
+        const isEditable = editableComment === comment.commentId;
+        return (
+          <section className="commentSection" key={comment.commentId}>
+            <div className="header">
+              <div className="userInfo">
+                <div
+                  className="userIcon"
+                  style={{ backgroundColor: comment.user.userIcon }}
+                />
+                <div className="commentInfo">
+                  <span className="userNickName">
+                    {comment.user.userNickName}
+                  </span>
+                  {fromNow(comment.createdAt)}
+                </div>
+              </div>
+              <div className="commentFunctions">
+                {!isEditable && (
+                  <button
+                    className="modifyButton"
+                    onClick={() => {
+                      onClickCommentModifyButton(comment.commentId);
+                    }}
+                  >
+                    수정
+                  </button>
+                )}
+                <button className="deleteButton">삭제</button>
+              </div>
+            </div>
+            {!isEditable ? (
+              <span className="content">{comment.content}</span>
+            ) : (
+              <section className="editCommentSection">
+                <textarea
+                  className="editCommentTextArea"
+                  ref={editCommentTextAreaRef}
+                  defaultValue={comment.content}
+                />
+                <div className="editCommentButtons">
+                  <button
+                    className="cancelButton"
+                    onClick={() => {
+                      setEditableComment(null);
+                    }}
+                  >
+                    취소
+                  </button>
+                  <button
+                    className="modifyConfirmButton"
+                    onClick={() => {
+                      onClickcommentModifyConfirmButton(comment.commentId);
+                    }}
+                  >
+                    댓글 수정
+                  </button>
+                </div>
+              </section>
+            )}
+          </section>
+        );
+      });
       setPostElement(post);
+      setCommentInputElement(commentInput);
+      setCommentsElement(comments);
     }
   }, [postInfo]);
 
   useEffect(() => {
     if (recentPosts != null) {
       const recentPost = (
-        <div className="footer">
+        <div className="recentSection">
           {recentPosts.prev && (
             <Link
               className="prevContainer"
@@ -319,8 +469,11 @@ export default function PostPage(props) {
           </Link>
         </div>
       </Modal>
+
       {postElement}
       {recentElement}
+      {commentInputElement}
+      {commentsElement}
     </div>
   );
 }
