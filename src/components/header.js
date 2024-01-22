@@ -1,22 +1,21 @@
-import React, { useEffect, useRef, useState } from "react";
-import "./header.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faSun,
-  faMagnifyingGlass,
   faArrowDown,
   faClose,
+  faMagnifyingGlass,
+  faSun,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
-import Modal from "react-modal";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
+import Modal from "react-modal";
+import { Link } from "react-router-dom";
+import "./header.css";
 
 export default function Header(props) {
-  const { isLogin, setIsLogin } = props;
+  const { isLogin, setIsLogin, loginModalShow, setLoginModalShow } = props;
 
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
 
-  const [showModal, setShowModal] = useState(false);
   const [modalState, setModalState] = useState("login");
   const [userEmail, setUserEmail] = useState();
   const [userPw, setUserPw] = useState();
@@ -28,8 +27,6 @@ export default function Header(props) {
   const loginButtonRef = useRef();
   const moreInfoSectionRef = useRef();
   const headerContainerRef = useRef();
-
-  const navigate = useNavigate();
 
   const modalTags = {
     title: useRef(),
@@ -45,6 +42,8 @@ export default function Header(props) {
   };
 
   useEffect(() => {
+    Modal.setAppElement("#root");
+
     var token = "";
     var userEmail = "";
     if (sessionStorage.getItem("userEmail")) {
@@ -78,11 +77,11 @@ export default function Header(props) {
   }, []);
 
   const showLoginModal = () => {
-    setShowModal(true);
+    setLoginModalShow(true);
   };
 
   const onClickCloseModalButton = () => {
-    setShowModal(false);
+    setLoginModalShow(false);
     setIsLogin(false);
   };
 
@@ -124,14 +123,15 @@ export default function Header(props) {
                 "userInfo",
                 JSON.stringify(userInfo)
               );
+
+              window.location.reload();
               setIsLogin(true);
             })
             .catch((err) => {
               console.error(err);
             });
 
-          setShowModal(false);
-          // navigate("/");
+          setLoginModalShow(false);
         })
         .catch((err) => {
           console.log(err);
@@ -143,7 +143,7 @@ export default function Header(props) {
         const userIcon =
           "#" + Math.floor(Math.random() * 0xffffff).toString(16);
         axios
-          .post(`/api/public/user/register`, {
+          .post(`/api/public/user`, {
             userEmail: userEmail,
             userPw: userPw,
             userIcon: userIcon,
@@ -209,8 +209,9 @@ export default function Header(props) {
   };
 
   const onClickLogoutButton = () => {
-    moreInfoSectionRef.current.style.display = "none";
     setIsLogin(false);
+    window.location.reload();
+    moreInfoSectionRef.current.style.display = "none";
     localStorage.removeItem("userEmail");
     localStorage.removeItem("token");
     localStorage.removeItem("userInfo");
@@ -275,7 +276,7 @@ export default function Header(props) {
 
   return (
     <div ref={headerContainerRef} className="headerContainer">
-      <Modal isOpen={showModal} className="loginModal">
+      <Modal isOpen={loginModalShow} className="loginModal">
         <div className="alertPopUP">
           <section className="contentSection">
             <span className="closeAlertButton">
@@ -345,28 +346,10 @@ export default function Header(props) {
               </label>
             </section>
 
-            {/* <setcion className="loginInputSection">
-              <input
-                ref={modalTags.userEmailInputRef}
-                className="userEmail"
-                type="email"
-                placeholder="이메일을 입력하세요."
-                onChange={handleUserEmailChange}
-              />
-              <span
-                ref={modalTags.mainButton}
-                to={"/"}
-                className="buttonLogin"
-                onClick={onClickLoginButton}
-              >
-                로그인
-              </span>
-            </setcion> */}
-
-            {/* <span ref={modalTags.subTitle} className="loginSubTitle">
+            <span ref={modalTags.subTitle} className="loginSubTitle">
               소셜 계정으로 로그인
             </span>
-            <section className="loginMethodSection">
+            {/* <section className="loginMethodSection">
               <FontAwesomeIcon icon={faGithub} />
               <FontAwesomeIcon icon={faGoogle} />
               <FontAwesomeIcon icon={faFacebook} />

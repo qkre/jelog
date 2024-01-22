@@ -1,16 +1,15 @@
-import { useEffect, useRef, useState } from "react";
-import "./writePage.css";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faArrowLeft,
-  faClose,
   faImage,
   faLink,
   faQuoteRight,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import imageCompression from "browser-image-compression";
+import { useEffect, useRef, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import "./writePage.css";
 
 export default function WritePage(props) {
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
@@ -47,7 +46,7 @@ export default function WritePage(props) {
   };
 
   useEffect(() => {
-    document.querySelector(".headerContainer").classList.add("hide");
+    // document.querySelector(".headerContainer").classList.add("hide");
 
     window.addEventListener("popstate", handleBack);
   }, []);
@@ -64,7 +63,7 @@ export default function WritePage(props) {
   }, [tagList]);
 
   const handleBack = () => {
-    document.querySelector(".headerContainer").classList.remove("hide");
+    // document.querySelector(".headerContainer").classList.remove("hide");
     console.log("뒤로 가기 버튼이 클릭 되었습니다.");
     window.removeEventListener("popstate", handleBack);
   };
@@ -83,14 +82,13 @@ export default function WritePage(props) {
     contentTextareaRef.current.style.height = "auto";
     contentTextareaRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
+    contentTextareaRef.current.scrollTop =
+      contentTextareaRef.current.scrollHeight;
+
     previewContentRef.current.style.height =
       contentTextareaRef.current.scrollHeight + "px";
     previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
 
-    contentTextareaRef.current.scrollTop =
-      contentTextareaRef.current.scrollHeight;
-
-    ensureDivWrap();
     errCheck();
   };
 
@@ -106,6 +104,10 @@ export default function WritePage(props) {
         contentElement.replaceChild(div, node);
       }
     }
+
+    previewContentRef.current.style.height =
+      contentTextareaRef.current.scrollHeight + "px";
+    previewContentRef.current.innerHTML = contentTextareaRef.current.innerHTML;
   };
 
   const resizeImage = async (image) => {
@@ -227,7 +229,9 @@ export default function WritePage(props) {
 
   const handleAddPost = async () => {
     if (!isError) {
+      ensureDivWrap();
       const title = titleTextareaRef.current.value;
+      previewContentRef.current.className = "content";
       let content = previewContentRef.current.outerHTML;
 
       const imgTags = previewContentRef.current.querySelectorAll("img");
@@ -258,7 +262,7 @@ export default function WritePage(props) {
         )
         .then((res) => {
           console.log(res);
-          document.querySelector(".headerContainer").classList.remove("hide");
+          // document.querySelector(".headerContainer").classList.remove("hide");
           navigate("/");
         })
         .catch((err) => console.log(err));
@@ -297,6 +301,7 @@ export default function WritePage(props) {
       titleTextareaRef.current.value === ""
     ) {
       buttonPostRef.current.removeAttribute("href");
+      // showAlertPopUp();
       setIsError(true);
     } else {
       buttonPostRef.current.setAttribute("href", "/");
@@ -306,6 +311,7 @@ export default function WritePage(props) {
 
   return (
     <section className={"writeContainer"}>
+      <div className="alertSave"></div>
       {isLoading && (
         <div className="loadingSpinner">
           <span className="loadingText">Uploading..</span>
@@ -393,9 +399,9 @@ export default function WritePage(props) {
             onClick={() => {
               window.removeEventListener("popstate", handleBack);
 
-              const headerContainer =
-                document.querySelector(".headerContainer");
-              headerContainer.classList.remove("hide");
+              // const headerContainer =
+              //   document.querySelector(".headerContainer");
+              // headerContainer.classList.remove("hide");
             }}
           >
             <FontAwesomeIcon icon={faArrowLeft} /> {" 나가기"}

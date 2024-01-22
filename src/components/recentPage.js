@@ -1,16 +1,16 @@
-import "./body.css";
-import React, { useEffect, useState } from "react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
+  faArrowDown,
   faArrowTrendUp,
   faClock,
-  faArrowDown,
   faEllipsisVertical,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import axios from "axios";
 import moment from "moment";
 import "moment/locale/ko";
+import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import "./mainPage.css";
 
 export default function RecentPage() {
   const serverLocation = "http://localhost:8080";

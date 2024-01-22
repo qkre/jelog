@@ -1,25 +1,29 @@
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import "./postPage.css";
 import {
+  faArrowDown,
   faArrowLeft,
   faArrowRight,
-  faArrowDown,
   faHeart,
   faShare,
 } from "@fortawesome/free-solid-svg-icons";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { Link, useParams } from "react-router-dom";
+import "./postPage.css";
 
-import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import moment from "moment";
-import Modal from "react-modal";
 import "moment/locale/ko";
+import { useEffect, useRef, useState } from "react";
+import Modal from "react-modal";
+import Header from "./header";
 
 export default function PostPage(props) {
   const userInfo = JSON.parse(sessionStorage.getItem("userInfo"));
   const token = sessionStorage.getItem("token");
 
-  const { isLogin, setLocation } = props;
+  const { isLogin, setIsLogin, loginModalShow, setLoginModalShow } = props;
+
+  const [location, setLocation] = useState();
+
   const [recentPosts, setRecentPosts] = useState(null);
   const [recentElement, setRecentElement] = useState();
   const [postInfo, setPostInfo] = useState(null);
@@ -27,17 +31,12 @@ export default function PostPage(props) {
   const [commentInputElement, setCommentInputElement] = useState();
   const [commentsElement, setCommentsElement] = useState();
 
-  const [commentEditMode, setCommentEditMode] = useState(false);
-
   const [editableComment, setEditableComment] = useState();
 
   const [isLiked, setIsLiked] = useState();
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-  const location = useLocation().pathname;
-
-  const userNickName = location.split("/")[2];
-  const postId = location.split("/")[3];
+  const { userNickName, postId } = useParams();
 
   const likesCountRef = useRef();
   const commentTextAreaRef = useRef();
@@ -59,12 +58,21 @@ export default function PostPage(props) {
     },
     onClickButtonConfirm: () => {
       deleteModalFunctions.closeModal();
+      console.log(postId);
       axios
-        .delete(`/api/private/post`, {
-          token: token,
-          postId: postId,
-          userEmail: userInfo.userEmail,
-        })
+        .delete(
+          `/api/private/post`,
+          {
+            token: token,
+            postId: postId,
+            userEmail: userInfo.userEmail,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
         .then((res) => {
           console.log(res);
         })
@@ -136,33 +144,36 @@ export default function PostPage(props) {
   };
 
   const onClickAddCommentsButton = () => {
-    axios
-      .post(
-        "/api/private/comment/write",
-        {
-          token: token,
-          userEmail: userInfo.userEmail,
-          postId: postInfo.postId,
-          content: commentTextAreaRef.current.value,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
+    if (isLogin) {
+      axios
+        .post(
+          "/api/private/comment/write",
+          {
+            token: token,
+            userEmail: userInfo.userEmail,
+            postId: postInfo.postId,
+            content: commentTextAreaRef.current.value,
           },
-        }
-      )
-      .then((res) => {
-        console.log(res.data);
-        window.location.reload();
-      })
-      .catch((err) => {
-        console.error(err);
-      });
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        )
+        .then((res) => {
+          console.log(res.data);
+          window.location.reload();
+        })
+        .catch((err) => {
+          console.error(err);
+        });
+    } else {
+      setLoginModalShow(true);
+    }
   };
 
   const onClickCommentModifyButton = (commentId) => {
     setEditableComment(commentId);
-    setCommentEditMode(!commentEditMode);
   };
 
   const onClickcommentModifyConfirmButton = (commentId) => {
@@ -181,23 +192,21 @@ export default function PostPage(props) {
       .then((res) => {
         console.log(res.data);
         setEditableComment(null);
-        setCommentEditMode(!commentEditMode);
       })
       .catch((err) => console.log(err));
   };
 
   useEffect(() => {
-    if (postId != null && userNickName != null) {
-      axios
-        .get(`/api/public/post/${userNickName}/${postId}`)
-        .then((res) => {
-          console.log(res.data);
-          const result = isAlreadyLiked(res.data);
-          setIsLiked(result);
-        })
-        .catch((err) => console.error(err));
-    }
-  }, []);
+    console.log(location);
+    axios
+      .get(`/api/public/post/${userNickName}/${postId}`)
+      .then((res) => {
+        console.log(res.data);
+        const result = isAlreadyLiked(res.data);
+        setIsLiked(result);
+      })
+      .catch((err) => console.error(err));
+  }, [location]);
 
   useEffect(() => {
     if (postId != null && userNickName != null) {
@@ -208,7 +217,7 @@ export default function PostPage(props) {
         })
         .catch((err) => console.error(err));
     }
-  }, [isLiked, editableComment]);
+  }, [isLiked, editableComment, location]);
 
   useEffect(() => {
     if (postInfo != null) {
@@ -254,7 +263,7 @@ export default function PostPage(props) {
             <section className="headerSection">
               <span className="title">{postInfo.title}</span>
               <section className="postInfoSection">
-                <div className="publishInfo">
+                <div className="postInfo">
                   <span className="userNickName">
                     {postInfo.user.userNickName}
                   </span>
@@ -300,7 +309,7 @@ export default function PostPage(props) {
               dangerouslySetInnerHTML={{ __html: contentElement.outerHTML }}
             />
           </section>
-          <section className={"summarySection"}>
+          <section className={"sideBarSection"}>
             <div className={"summaryIndexes"}>
               <span>Index1</span>
               <span>Index2</span>
@@ -469,11 +478,20 @@ export default function PostPage(props) {
           </Link>
         </div>
       </Modal>
-
-      {postElement}
-      {recentElement}
-      {commentInputElement}
-      {commentsElement}
+      <section className="header">
+        <Header
+          isLogin={isLogin}
+          setIsLogin={setIsLogin}
+          loginModalShow={loginModalShow}
+          setLoginModalShow={setLoginModalShow}
+        />
+      </section>
+      <section className="body">
+        {postElement}
+        {recentElement}
+        {commentInputElement}
+        {commentsElement}
+      </section>
     </div>
   );
 }
