@@ -2,30 +2,38 @@ button {
   cursor: pointer;
 }
 
-.postContainer {
-  display: flex;
-  padding: 20px 100px 20px 100px;
-  flex-direction: column;
-  align-items: center;
+.postContainer * {
+  background-color: white;
 }
 
-.postContainer .postSection {
+.postContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.postContainer .body {
+  display: flex;
+  flex-direction: column;
+  padding: 0% 10%;
+}
+
+.postContainer .body .postSection {
   width: 100%;
   justify-content: space-between;
   display: flex;
 }
 
-.postContainer .postSection img {
+.postContainer .body .postSection img {
   max-width: 60vw;
 }
 
-.postContainer .postSection .sideBarSection {
+.postContainer .body .postSection .sideBarSection {
   flex: 1;
   display: flex;
   justify-content: end;
 }
 
-.postContainer .postSection .sideBarSection .sideBarMenu {
+.postContainer .body .postSection .sideBarSection .sideBarMenu {
   width: 60px;
   height: 150px;
   border-radius: 50px;
@@ -36,8 +44,7 @@ button {
   flex-direction: column;
   text-align: center;
 }
-
-.postContainer .postSection .sideBarSection .sideBarMenu button {
+.postContainer .body .postSection .sideBarSection .sideBarMenu button {
   font-size: 20px;
   background-color: white;
   padding: 10px;
@@ -46,15 +53,25 @@ button {
   cursor: pointer;
 }
 
-.postContainer .postSection .sideBarSection .sideBarMenu .buttonUnlike {
+.postContainer .body .postSection .sideBarSection .sideBarMenu .buttonUnlike {
   color: var(--velog-green);
 }
 
-.postContainer .postSection .sideBarSection .sideBarMenu .likesCount {
+.postContainer .body .postSection .sideBarSection .sideBarMenu .likesCount {
   padding: 10px;
+  background-color: var(--velog-grey);
 }
 
-.postContainer .postSection .mainSection {
+.postContainer .body .postSection .sideBarSection .summaryIndexes {
+  display: flex;
+  flex-direction: column;
+  max-width: 200px;
+  color: grey;
+  border-left: 2px solid var(--velog-grey);
+  padding: 5px;
+}
+
+.postContainer .body .postSection .mainSection {
   flex: 8;
   padding: 10px;
   display: flex;
@@ -62,40 +79,43 @@ button {
   margin: 0px 30px;
 }
 
-.postContainer .postSection .mainSection .headerSection .title {
+.postContainer .body .postSection .mainSection .headerSection .title {
   font-size: 40px;
   font-weight: 800;
 }
 
-.postContainer .postSection .mainSection .headerSection .postInfoSection {
+.postContainer .body .postSection .mainSection .headerSection .postInfoSection {
   display: flex;
   margin: 10px 0px 10px 0px;
   justify-content: space-between;
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .headerSection
   .postInfoSection
-  .publishInfo
+  .postInfo
   .userID {
   font-weight: 600;
   margin-right: 10px;
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .headerSection
   .postInfoSection
-  .publishInfo
+  .postInfo
   .createdAt {
   margin-left: 5px;
   color: grey;
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .headerSection
@@ -106,6 +126,7 @@ button {
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .headerSection
@@ -117,11 +138,11 @@ button {
   text-decoration: none;
 }
 
-.postContainer .postSection .mainSection .headerSection .tagSection {
+.postContainer .body .postSection .mainSection .headerSection .tagSection {
   display: flex;
 }
 
-.postContainer .postSection .mainSection .headerSection .tagSection * {
+.postContainer .body .postSection .mainSection .headerSection .tagSection * {
   color: var(--velog-green);
   padding: 2.5px 10px;
   background-color: var(--velog-grey);
@@ -129,7 +150,11 @@ button {
   border-radius: 50px;
 }
 
-.postContainer .postSection .mainSection .seriesSection {
+.postContainer .body .postSection .mainSection .seriesSection * {
+  background-color: var(--velog-grey);
+}
+
+.postContainer .body .postSection .mainSection .seriesSection {
   padding: 20px;
   margin: 20px 0px 50px 0px;
   background-color: var(--velog-grey);
@@ -138,18 +163,19 @@ button {
   border-radius: 5px;
 }
 
-.postContainer .postSection .mainSection .seriesSection .seriesTitle {
+.postContainer .body .postSection .mainSection .seriesSection .seriesTitle {
   font-size: 20px;
   font-weight: 600;
   margin-bottom: 40px;
 }
 
-.postContainer .postSection .mainSection .seriesSection .indicators {
+.postContainer .body .postSection .mainSection .seriesSection .indicators {
   display: flex;
   justify-content: space-between;
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .seriesSection
@@ -159,6 +185,7 @@ button {
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .seriesSection
@@ -171,6 +198,7 @@ button {
 }
 
 .postContainer
+  .body
   .postSection
   .mainSection
   .seriesSection
@@ -186,41 +214,25 @@ button {
   border-radius: 50%;
 }
 
-.postContainer .postSection .mainSection .contentSection {
+.postContainer .body .postSection .mainSection .contentSection {
   max-width: 50vw;
 }
 
-.postContainer .postSection .mainSection .contentSection img {
+.postContainer .body .postSection .mainSection .contentSection img {
   width: 100%;
-}
-
-.postContainer .postSection .summarySection {
-  flex: 1;
-  /* border: 2px solid red; */
-  display: flex;
-  flex-direction: column;
-  margin-left: 10px;
-}
-
-.postContainer .postSection .summarySection .summaryIndexes {
-  display: flex;
-  flex-direction: column;
-  max-width: 200px;
-  color: grey;
-  border-left: 2px solid var(--velog-grey);
-  padding: 5px;
 }
 
 .postContainer .recentSection {
   display: flex;
-  width: 75%;
-  justify-content: space-between;
+  justify-content: space-around;
+  margin: 20px 0px;
 }
 
 .postContainer .recentSection .prevContainer {
   width: 45%;
   background-color: var(--velog-grey);
-  padding: 20px;
+  border-radius: 5px;
+  padding: 10px;
   display: flex;
   align-items: center;
   justify-content: start;

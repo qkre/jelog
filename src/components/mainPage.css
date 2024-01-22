@@ -1,0 +1,110 @@
+.mainPage {
+  /* border: 2px solid red; */
+  /* padding: 0px 5%; */
+  display: flex;
+  flex-direction: column;
+}
+
+.mainPage .header .function {
+  /* border: 2px solid blue; */
+  padding: 0px 5%;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.mainPage .header .function .tags {
+  display: flex;
+}
+
+.mainPage .header .function .tags > * {
+  display: flex;
+  border: none;
+  margin-right: 10px;
+  font-size: 20px;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: black;
+}
+
+.mainPage .header .function button {
+  border: none;
+  font-size: 20px;
+}
+
+.mainPage .body {
+  /* border: 2px solid blue; */
+  padding: 0px 5%;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: stretch;
+}
+
+.mainPage .body .postBox:hover {
+  transform: translateY(-5px);
+  box-shadow: 0px 8px 10px 0px grey;
+}
+
+.mainPage .body .postBox * {
+  background-color: white;
+}
+
+.mainPage .body .postBox .innerBox {
+  height: 100%;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainPage .body .postBox .innerBox .thumbnail {
+  width: 100%;
+  background-color: white;
+}
+
+.mainPage .body .postBox .innerBox .thumbnail img {
+  width: 100%;
+  max-height: 150px;
+}
+
+.mainPage .body .postBox .innerBox .title {
+  padding: 10px;
+  font-weight: 700;
+  background-color: white;
+}
+
+.mainPage .body .postBox .innerBox .content {
+  padding: 10px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.mainPage .body .postBox .date {
+  padding: 10px;
+  color: gray;
+}
+
+.mainPage .body .postBox .infoSection {
+  display: flex;
+  padding: 10px;
+  justify-content: space-between;
+  border-top: 2px solid var(--velog-grey);
+}
+
+.mainPage .body .postBox .infoSection > div {
+  display: flex;
+  align-items: center;
+}
+
+.mainPage .body .postBox .infoSection .userIcon {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.mainPage .body .postBox .infoSection .likesCount {
+  width: 30px;
+  display: flex;
+  justify-content: space-between;
+}
